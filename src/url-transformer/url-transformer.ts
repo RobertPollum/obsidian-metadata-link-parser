@@ -188,7 +188,7 @@ export class UrlTransformer {
             const testUrl = this.applyTransformation(TEST_URL, rule);
             const proxyBaseUrl = this.extractProxyBaseUrl(testUrl);
             
-            this.healthCache[proxyBaseUrl] = undefined as any;
+            delete this.healthCache[proxyBaseUrl];
             
             const healthy = await this.checkProxyHealth(proxyBaseUrl, rule);
             results.set(rule.name, healthy);

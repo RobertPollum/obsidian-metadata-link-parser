@@ -79,12 +79,11 @@ export class MetadataLinkParser {
                         .map(([key, value]) => `${key}: ${value}`);
                     const newFrontmatter = `---\n${yamlLines.join('\n')}\n---`;
                     
-                    // const beforeFrontmatter = content.substring(0, frontMatterInfo.from);
-                    // const afterFrontmatter = content.substring(frontMatterInfo.to);
-                    // const newContent = beforeFrontmatter + newFrontmatter + afterFrontmatter;
+                    const beforeFrontmatter = content.substring(0, frontMatterInfo.from);
+                    const afterFrontmatter = content.substring(frontMatterInfo.to);
+                    const newContent = beforeFrontmatter + newFrontmatter + afterFrontmatter;
                     
-                    // await this.app.vault.modify(file, newContent);
-                    await this.app.vault.modify(file, newFrontmatter)
+                    await this.app.vault.modify(file, newContent);
                 }
             }
         } catch (error) {
@@ -420,6 +419,95 @@ export class MetadataLinkParser {
         }
 
         new Notice(`Completed: ${processedCount} processed, ${skippedCount} skipped (already processed)`);
+    }
+
+    /**
+     * Get the body content length (excluding frontmatter)
+     */
+    private getBodyContentLength(fileContent: string): number {
+        const frontMatterInfo = getFrontMatterInfo(fileContent);
+        if (frontMatterInfo.exists) {
+            return fileContent.substring(frontMatterInfo.to).trim().length;
+        }
+        return fileContent.trim().length;
+    }
+
+    /**
+     * Auto-process a file only if fetched content is significantly longer
+     * than existing content. Used for scheduled background processing.
+     */
+    async autoProcessFileIfLonger(file: TFile, minContentRatio: number): Promise<boolean> {
+        try {
+            if (await this.isFileProcessed(file)) {
+                return false;
+            }
+
+            const content = await this.app.vault.read(file);
+            const existingBodyLength = this.getBodyContentLength(content);
+
+            let url = this.extractUrlFromFrontmatter(content);
+            if (!url) {
+                url = this.extractUrlFromContent(content);
+            }
+
+            if (!url) {
+                return false;
+            }
+
+            const transformResult = await this.transformUrlIfNeeded(url);
+            if (!transformResult.url) {
+                return false;
+            }
+
+            const articleMarkdown = await this.readItLaterApi.getMarkdownContent(transformResult.url);
+            if (!articleMarkdown) {
+                return false;
+            }
+
+            const fetchedLength = articleMarkdown.length;
+            const ratio = existingBodyLength > 0 ? fetchedLength / existingBodyLength : fetchedLength;
+
+            if (ratio >= minContentRatio) {
+                if (transformResult.appliedRule) {
+                    await this.updateFrontmatterWithProxyInfo(file, transformResult.originalUrl, transformResult.url, transformResult.appliedRule);
+                }
+
+                const separator = '\n\n---\n\n## Retrieved Article Content\n\n';
+                await this.app.vault.append(file, separator + articleMarkdown);
+                await this.markFileAsProcessed(file);
+                
+                console.log(`Auto-processed ${file.path}: ratio ${ratio.toFixed(2)} >= ${minContentRatio}`);
+                return true;
+            }
+
+            return false;
+        } catch (error) {
+            console.error(`Error auto-processing ${file.path}:`, error);
+            return false;
+        }
+    }
+
+    /**
+     * Auto-process all files in a folder based on content length comparison
+     */
+    async autoProcessFolder(folderPath: string, minContentRatio: number): Promise<{ processed: number; skipped: number }> {
+        const files = this.app.vault.getMarkdownFiles().filter(
+            (file: TFile) => file.path.startsWith(folderPath)
+        );
+
+        let processed = 0;
+        let skipped = 0;
+
+        for (const file of files) {
+            const wasProcessed = await this.autoProcessFileIfLonger(file, minContentRatio);
+            if (wasProcessed) {
+                processed++;
+            } else {
+                skipped++;
+            }
+        }
+
+        return { processed, skipped };
     }
 
     /**

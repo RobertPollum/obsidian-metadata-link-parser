@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting, Notice } from 'obsidian';
+import { App, PluginSettingTab, Setting, Notice, Modal } from 'obsidian';
 import { TransformationConfigManager } from '../url-transformer/transformation-config';
 import { TransformationRule } from '../url-transformer/transformation-types';
 import { UrlTransformer } from '../url-transformer/url-transformer';
@@ -19,9 +19,68 @@ export class UrlTransformerSettingTab extends PluginSettingTab {
 
         containerEl.createEl('h2', { text: 'URL Transformation Settings' });
 
+        this.displayAutoProcessingSettings();
         this.displayHealthCheckSettings();
         this.displayRulesList();
         this.displayAddRuleButton();
+    }
+
+    private displayAutoProcessingSettings(): void {
+        const { containerEl } = this;
+        const config = this.configManager.getConfig();
+
+        containerEl.createEl('h3', { text: 'Auto Processing' });
+
+        new Setting(containerEl)
+            .setName('Enable auto processing')
+            .setDesc('Automatically scan a folder and process files when fetched content is longer')
+            .addToggle(toggle => toggle
+                .setValue(config.autoProcessing.enabled)
+                .onChange(async (value) => {
+                    config.autoProcessing.enabled = value;
+                    await this.configManager.saveConfig(config);
+                    if (this.plugin.restartAutoProcessing) {
+                        this.plugin.restartAutoProcessing();
+                    }
+                }));
+
+        new Setting(containerEl)
+            .setName('Watch folder')
+            .setDesc('Folder path to monitor for files with URLs')
+            .addText(text => text
+                .setValue(config.autoProcessing.folderPath)
+                .setPlaceholder('e.g., Articles or Inbox/RSS')
+                .onChange(async (value) => {
+                    config.autoProcessing.folderPath = value;
+                    await this.configManager.saveConfig(config);
+                }));
+
+        new Setting(containerEl)
+            .setName('Check frequency (minutes)')
+            .setDesc('How often to scan the folder for new content')
+            .addSlider(slider => slider
+                .setLimits(5, 360, 5)
+                .setValue(config.autoProcessing.frequencyMinutes)
+                .setDynamicTooltip()
+                .onChange(async (value) => {
+                    config.autoProcessing.frequencyMinutes = value;
+                    await this.configManager.saveConfig(config);
+                    if (this.plugin.restartAutoProcessing) {
+                        this.plugin.restartAutoProcessing();
+                    }
+                }));
+
+        new Setting(containerEl)
+            .setName('Minimum content ratio')
+            .setDesc('Only append if fetched content is this many times longer than existing (e.g., 2.0 = twice as long)')
+            .addSlider(slider => slider
+                .setLimits(1.5, 10, 0.5)
+                .setValue(config.autoProcessing.minContentLengthRatio)
+                .setDynamicTooltip()
+                .onChange(async (value) => {
+                    config.autoProcessing.minContentLengthRatio = value;
+                    await this.configManager.saveConfig(config);
+                }));
     }
 
     private displayHealthCheckSettings(): void {
@@ -301,5 +360,3 @@ class RuleEditorModal extends Modal {
         contentEl.empty();
     }
 }
-
-import { Modal } from 'obsidian';

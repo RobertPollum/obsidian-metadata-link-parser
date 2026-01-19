@@ -1,5 +1,5 @@
 import { App } from 'obsidian';
-import { TransformationConfig, TransformationRule } from './transformation-types';
+import { TransformationConfig, TransformationRule, AutoProcessingConfig } from './transformation-types';
 import { getDefaultTransformationRules } from './default-templates';
 
 const CONFIG_FILE_PATH = '.obsidian/url-transformations.json';
@@ -12,11 +12,21 @@ export class TransformationConfigManager {
         this.app = app;
     }
 
+    getDefaultAutoProcessingConfig(): AutoProcessingConfig {
+        return {
+            enabled: false,
+            folderPath: '',
+            frequencyMinutes: 60,
+            minContentLengthRatio: 2.0
+        };
+    }
+
     getDefaultConfig(): TransformationConfig {
         return {
             rules: getDefaultTransformationRules(),
             proxyHealthCacheTtlMinutes: 5,
-            proxyHealthTimeoutMs: 5000
+            proxyHealthTimeoutMs: 5000,
+            autoProcessing: this.getDefaultAutoProcessingConfig()
         };
     }
 
@@ -51,10 +61,18 @@ export class TransformationConfigManager {
 
         const newDefaultRules = defaultRules.filter(dr => !loadedRuleIds.has(dr.id));
 
+        const defaultAutoProcessing = this.getDefaultAutoProcessingConfig();
+
         return {
             rules: [...loadedConfig.rules, ...newDefaultRules],
             proxyHealthCacheTtlMinutes: loadedConfig.proxyHealthCacheTtlMinutes ?? 5,
-            proxyHealthTimeoutMs: loadedConfig.proxyHealthTimeoutMs ?? 5000
+            proxyHealthTimeoutMs: loadedConfig.proxyHealthTimeoutMs ?? 5000,
+            autoProcessing: {
+                enabled: loadedConfig.autoProcessing?.enabled ?? defaultAutoProcessing.enabled,
+                folderPath: loadedConfig.autoProcessing?.folderPath ?? defaultAutoProcessing.folderPath,
+                frequencyMinutes: loadedConfig.autoProcessing?.frequencyMinutes ?? defaultAutoProcessing.frequencyMinutes,
+                minContentLengthRatio: loadedConfig.autoProcessing?.minContentLengthRatio ?? defaultAutoProcessing.minContentLengthRatio
+            }
         };
     }
 
