@@ -18,10 +18,18 @@ export interface TransformationResult {
     error?: string;
 }
 
+export interface AutoProcessingConfig {
+    enabled: boolean;
+    folderPath: string;
+    frequencyMinutes: number;
+    minContentLengthRatio: number;
+}
+
 export interface TransformationConfig {
     rules: TransformationRule[];
     proxyHealthCacheTtlMinutes: number;
     proxyHealthTimeoutMs: number;
+    autoProcessing: AutoProcessingConfig;
 }
 
 export interface ProxyHealthCache {

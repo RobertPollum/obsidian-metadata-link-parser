@@ -1,4 +1,4 @@
-import { Plugin, TFile, TFolder, Menu } from 'obsidian';
+import { Plugin, TFile, TFolder, Menu, MarkdownView } from 'obsidian';
 import { MetadataLinkParser, parseMetadataLink, parseMetadataLinkAndAppend, parseMetadataLinksInFolder } from './parse-metadata-link';
 import { NoteService, getNoteService, isReadItLaterInstalled } from './ReadItLaterStubs';
 import { TransformationConfigManager } from './url-transformer/transformation-config';
@@ -11,6 +11,7 @@ import { UrlTransformerSettingTab } from './settings/url-transformer-settings';
 export default class MetadataLinkParserPlugin extends Plugin {
     private noteService: NoteService;
     private configManager: TransformationConfigManager;
+    private autoProcessingIntervalId: number | null = null;
 
     private createParser(): MetadataLinkParser {
         const parser = new MetadataLinkParser(this.app, this.noteService);
@@ -150,10 +151,93 @@ export default class MetadataLinkParserPlugin extends Plugin {
                 }
             })
         );
+
+        // Start auto-processing if enabled
+        this.startAutoProcessing();
+
+        // Register context menu for editor (right-click inside a file)
+        this.registerEvent(
+            this.app.workspace.on('editor-menu', (menu: Menu, editor, view) => {
+                if (view instanceof MarkdownView && view.file) {
+                    const file = view.file;
+
+                    menu.addItem((item) => {
+                        item
+                            .setTitle('Append article to this file')
+                            .setIcon('link')
+                            .onClick(async () => {
+                                const parser = this.createParser();
+                                await parser.processFileAndAppend(file);
+                            });
+                    });
+
+                    menu.addItem((item) => {
+                        item
+                            .setTitle('Create note from link')
+                            .setIcon('file-plus')
+                            .onClick(async () => {
+                                const parser = this.createParser();
+                                await parser.processFile(file);
+                            });
+                    });
+                }
+            })
+        );
     }
 
 
+    private startAutoProcessing(): void {
+        const config = this.configManager.getConfig();
+        
+        if (!config.autoProcessing.enabled || !config.autoProcessing.folderPath) {
+            return;
+        }
+
+        const intervalMs = config.autoProcessing.frequencyMinutes * 60 * 1000;
+        
+        console.log(`Auto-processing enabled: checking "${config.autoProcessing.folderPath}" every ${config.autoProcessing.frequencyMinutes} minutes`);
+
+        this.autoProcessingIntervalId = window.setInterval(async () => {
+            await this.runAutoProcessing();
+        }, intervalMs);
+
+        this.registerInterval(this.autoProcessingIntervalId);
+    }
+
+    private stopAutoProcessing(): void {
+        if (this.autoProcessingIntervalId !== null) {
+            window.clearInterval(this.autoProcessingIntervalId);
+            this.autoProcessingIntervalId = null;
+        }
+    }
+
+    public restartAutoProcessing(): void {
+        this.stopAutoProcessing();
+        this.startAutoProcessing();
+    }
+
+    private async runAutoProcessing(): Promise<void> {
+        const config = this.configManager.getConfig();
+        
+        if (!config.autoProcessing.enabled || !config.autoProcessing.folderPath) {
+            return;
+        }
+
+        console.log(`Running auto-processing for folder: ${config.autoProcessing.folderPath}`);
+        
+        const parser = this.createParser();
+        const result = await parser.autoProcessFolder(
+            config.autoProcessing.folderPath,
+            config.autoProcessing.minContentLengthRatio
+        );
+
+        if (result.processed > 0) {
+            console.log(`Auto-processing complete: ${result.processed} files updated, ${result.skipped} skipped`);
+        }
+    }
+
     onunload() {
+        this.stopAutoProcessing();
         console.log('Unloading Metadata Link Parser Plugin');
     }
 }
