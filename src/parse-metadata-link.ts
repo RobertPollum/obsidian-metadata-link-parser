@@ -346,6 +346,10 @@ export class MetadataLinkParser {
 
                 if (ratio < minContentRatio) {
                     console.log(`Skipping ${file.path}: content ratio ${ratio.toFixed(2)} < ${minContentRatio}`);
+                    // Mark as processed to prevent future unnecessary requests
+                    if (checkProcessed) {
+                        await this.markFileAsProcessed(file);
+                    }
                     return;
                 }
                 console.log(`Processing ${file.path}: content ratio ${ratio.toFixed(2)} >= ${minContentRatio}`);
