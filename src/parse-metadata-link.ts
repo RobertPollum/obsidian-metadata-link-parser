@@ -288,8 +288,9 @@ export class MetadataLinkParser {
      * 
      * @param file - The file to process
      * @param checkProcessed - If true, checks if file was already processed (for batch operations)
+     * @param minContentRatio - If provided, only append if fetched content is this many times longer than existing
      */
-    async processFileAndAppend(file: TFile, checkProcessed: boolean = false): Promise<void> {
+    async processFileAndAppend(file: TFile, checkProcessed: boolean = false, minContentRatio?: number): Promise<void> {
         try {
             // Check if already processed (only in batch mode)
             if (checkProcessed && await this.isFileProcessed(file)) {
@@ -335,6 +336,19 @@ export class MetadataLinkParser {
             if (!articleMarkdown) {
                 new Notice(`Failed to fetch content from: ${urlToFetch}`);
                 return;
+            }
+
+            // Check content length ratio if specified
+            if (minContentRatio !== undefined) {
+                const existingBodyLength = this.getBodyContentLength(content);
+                const fetchedLength = articleMarkdown.length;
+                const ratio = existingBodyLength > 0 ? fetchedLength / existingBodyLength : fetchedLength;
+
+                if (ratio < minContentRatio) {
+                    console.log(`Skipping ${file.path}: content ratio ${ratio.toFixed(2)} < ${minContentRatio}`);
+                    return;
+                }
+                console.log(`Processing ${file.path}: content ratio ${ratio.toFixed(2)} >= ${minContentRatio}`);
             }
 
             if (transformResult.appliedRule) {
@@ -412,8 +426,11 @@ export class MetadataLinkParser {
     /**
      * Process all files in a folder and append content to each
      * Skips files that have already been processed (have article_processed: true)
+     * 
+     * @param folderPath - The folder path to process
+     * @param minContentRatio - If provided, only append if fetched content is this many times longer than existing
      */
-    async processFolderFilesAndAppend(folderPath: string): Promise<void> {
+    async processFolderFilesAndAppend(folderPath: string, minContentRatio?: number): Promise<void> {
         const files = this.app.vault.getMarkdownFiles().filter(
             (file: TFile) => file.path.startsWith(folderPath)
         );
@@ -432,11 +449,20 @@ export class MetadataLinkParser {
             const wasProcessed = await this.isFileProcessed(file);
             if (wasProcessed) {
                 skippedCount++;
-            } else {
-                processedCount++;
+                continue;
             }
-            // Pass checkProcessed: true to enable tracking
-            await this.processFileAndAppend(file, true);
+            
+            // Pass checkProcessed: true to enable tracking and minContentRatio if provided
+            await this.processFileAndAppend(file, true, minContentRatio);
+            
+            // Only increment processedCount if file was actually processed
+            // (processFileAndAppend will mark as processed if successful)
+            const nowProcessed = await this.isFileProcessed(file);
+            if (nowProcessed) {
+                processedCount++;
+            } else {
+                skippedCount++;
+            }
         }
 
         new Notice(`Completed: ${processedCount} processed, ${skippedCount} skipped (already processed)`);

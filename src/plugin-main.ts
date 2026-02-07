@@ -77,7 +77,8 @@ export default class MetadataLinkParserPlugin extends Plugin {
             callback: async () => {
                 const folderPath = 'Articles';
                 const parser = this.createParser();
-                await parser.processFolderFilesAndAppend(folderPath);
+                const config = this.configManager.getConfig();
+                await parser.processFolderFilesAndAppend(folderPath, config.autoProcessing.minContentLengthRatio);
             }
         });
 
@@ -112,7 +113,8 @@ export default class MetadataLinkParserPlugin extends Plugin {
                             .setIcon('link')
                             .onClick(async () => {
                                 const parser = this.createParser();
-                                await parser.processFolderFilesAndAppend(file.path);
+                                const config = this.configManager.getConfig();
+                                await parser.processFolderFilesAndAppend(file.path, config.autoProcessing.minContentLengthRatio);
                             });
                     });
 
