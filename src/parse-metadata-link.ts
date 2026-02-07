@@ -27,6 +27,34 @@ export class MetadataLinkParser {
     }
 
     /**
+     * Serialize a value to YAML format
+     * Handles arrays, strings with special characters, and other types
+     */
+    private serializeYamlValue(key: string, value: any): string {
+        if (Array.isArray(value)) {
+            if (value.length === 0) {
+                return `${key}: []`;
+            }
+            const items = value.map(item => `  - ${item}`).join('\n');
+            return `${key}:\n${items}`;
+        }
+        
+        if (typeof value === 'string' && (value.includes(':') || value.includes('#') || value.includes('\n'))) {
+            return `${key}: "${value.replace(/"/g, '\\"')}"`;
+        }
+        
+        if (typeof value === 'boolean' || typeof value === 'number') {
+            return `${key}: ${value}`;
+        }
+        
+        if (value === null || value === undefined) {
+            return `${key}: null`;
+        }
+        
+        return `${key}: ${value}`;
+    }
+
+    /**
      * Check if a file has already been processed
      * Looks for 'article_processed: true' in frontmatter
      */
@@ -76,7 +104,7 @@ export class MetadataLinkParser {
                 if (frontmatter?.article_processed !== true) {
                     const updatedFrontmatter = { ...frontmatter, article_processed: true };
                     const yamlLines = Object.entries(updatedFrontmatter)
-                        .map(([key, value]) => `${key}: ${value}`);
+                        .map(([key, value]) => this.serializeYamlValue(key, value));
                     const newFrontmatter = `---\n${yamlLines.join('\n')}\n---\n`;
                     
                     const afterFrontmatter = content.substring(frontMatterInfo.contentStart ?? frontMatterInfo.to);
@@ -192,12 +220,7 @@ export class MetadataLinkParser {
                 };
                 
                 const yamlLines = Object.entries(updatedFrontmatter)
-                    .map(([key, value]) => {
-                        if (typeof value === 'string' && (value.includes(':') || value.includes('#'))) {
-                            return `${key}: "${value}"`;
-                        }
-                        return `${key}: ${value}`;
-                    });
+                    .map(([key, value]) => this.serializeYamlValue(key, value));
                 const newFrontmatter = `---\n${yamlLines.join('\n')}\n---\n`;
                 
                 const afterFrontmatter = content.substring(frontMatterInfo.contentStart ?? frontMatterInfo.to);
