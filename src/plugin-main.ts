@@ -26,7 +26,7 @@ export default class MetadataLinkParserPlugin extends Plugin {
         this.noteService = getNoteService(this.app);
         
         // Initialize URL transformation config manager
-        this.configManager = new TransformationConfigManager(this.app);
+        this.configManager = new TransformationConfigManager(this.app, this);
         await this.configManager.loadConfig();
         
         // Add settings tab

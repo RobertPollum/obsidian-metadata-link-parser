@@ -1,15 +1,15 @@
-import { App } from 'obsidian';
+import { App, Plugin } from 'obsidian';
 import { TransformationConfig, TransformationRule, AutoProcessingConfig } from './transformation-types';
 import { getDefaultTransformationRules } from './default-templates';
 
-const CONFIG_FILE_PATH = '.obsidian/url-transformations.json';
-
 export class TransformationConfigManager {
     private app: App;
+    private plugin: Plugin;
     private config: TransformationConfig | null = null;
 
-    constructor(app: App) {
+    constructor(app: App, plugin: Plugin) {
         this.app = app;
+        this.plugin = plugin;
     }
 
     getDefaultAutoProcessingConfig(): AutoProcessingConfig {
@@ -32,18 +32,16 @@ export class TransformationConfigManager {
 
     async loadConfig(): Promise<TransformationConfig> {
         try {
-            const configFile = this.app.vault.getAbstractFileByPath(CONFIG_FILE_PATH);
+            const loadedData = await this.plugin.loadData();
             
-            if (!configFile) {
+            if (!loadedData || !loadedData.transformationConfig) {
                 const defaultConfig = this.getDefaultConfig();
                 await this.saveConfig(defaultConfig);
                 this.config = defaultConfig;
                 return defaultConfig;
             }
 
-            const content = await this.app.vault.read(configFile as any);
-            const loadedConfig = JSON.parse(content) as TransformationConfig;
-
+            const loadedConfig = loadedData.transformationConfig as TransformationConfig;
             const mergedConfig = this.mergeWithDefaults(loadedConfig);
             this.config = mergedConfig;
             return mergedConfig;
@@ -78,16 +76,9 @@ export class TransformationConfigManager {
 
     async saveConfig(config: TransformationConfig): Promise<void> {
         try {
-            const configJson = JSON.stringify(config, null, 2);
-            
-            const configFile = this.app.vault.getAbstractFileByPath(CONFIG_FILE_PATH);
-            
-            if (configFile) {
-                await this.app.vault.modify(configFile as any, configJson);
-            } else {
-                await this.app.vault.create(CONFIG_FILE_PATH, configJson);
-            }
-
+            const currentData = await this.plugin.loadData() || {};
+            currentData.transformationConfig = config;
+            await this.plugin.saveData(currentData);
             this.config = config;
         } catch (error) {
             console.error('Error saving transformation config:', error);
