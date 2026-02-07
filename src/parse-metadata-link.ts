@@ -77,11 +77,10 @@ export class MetadataLinkParser {
                     const updatedFrontmatter = { ...frontmatter, article_processed: true };
                     const yamlLines = Object.entries(updatedFrontmatter)
                         .map(([key, value]) => `${key}: ${value}`);
-                    const newFrontmatter = `---\n${yamlLines.join('\n')}\n---`;
+                    const newFrontmatter = `---\n${yamlLines.join('\n')}\n---\n`;
                     
-                    const beforeFrontmatter = content.substring(0, frontMatterInfo.from);
-                    const afterFrontmatter = content.substring(frontMatterInfo.to);
-                    const newContent = beforeFrontmatter + newFrontmatter + afterFrontmatter;
+                    const afterFrontmatter = content.substring(frontMatterInfo.contentStart ?? frontMatterInfo.to);
+                    const newContent = newFrontmatter + afterFrontmatter;
                     
                     await this.app.vault.modify(file, newContent);
                 }
@@ -199,11 +198,10 @@ export class MetadataLinkParser {
                         }
                         return `${key}: ${value}`;
                     });
-                const newFrontmatter = `---\n${yamlLines.join('\n')}\n---`;
+                const newFrontmatter = `---\n${yamlLines.join('\n')}\n---\n`;
                 
-                const beforeFrontmatter = content.substring(0, frontMatterInfo.from);
-                const afterFrontmatter = content.substring(frontMatterInfo.to);
-                const newContent = beforeFrontmatter + newFrontmatter + afterFrontmatter;
+                const afterFrontmatter = content.substring(frontMatterInfo.contentStart ?? frontMatterInfo.to);
+                const newContent = newFrontmatter + afterFrontmatter;
                 
                 await this.app.vault.modify(file, newContent);
             }
