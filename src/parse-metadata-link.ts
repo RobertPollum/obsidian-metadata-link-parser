@@ -1,7 +1,7 @@
-import { App, TFile, Notice, getFrontMatterInfo, parseYaml } from 'obsidian';
-import { ReadItLaterApi, NoteService } from './ReadItLaterStubs';
-import { UrlTransformer } from './url-transformer/url-transformer';
-import { TransformationConfig } from './url-transformer/transformation-types';
+import { App, TFile, Notice, getFrontMatterInfo, parseYaml } from "obsidian";
+import { ReadItLaterApi, NoteService } from "./ReadItLaterStubs";
+import { UrlTransformer } from "./url-transformer/url-transformer";
+import { TransformationConfig } from "./url-transformer/transformation-types";
 
 /**
  * Script to extract metadata link from an Obsidian markdown file
@@ -22,7 +22,7 @@ export class MetadataLinkParser {
         this.transformationConfig = config;
         this.urlTransformer = new UrlTransformer(
             config.proxyHealthCacheTtlMinutes,
-            config.proxyHealthTimeoutMs
+            config.proxyHealthTimeoutMs,
         );
     }
 
@@ -35,22 +35,22 @@ export class MetadataLinkParser {
             if (value.length === 0) {
                 return `${key}: []`;
             }
-            const items = value.map(item => `  - ${item}`).join('\n');
+            const items = value.map(item => `  - ${item}`).join("\n");
             return `${key}:\n${items}`;
         }
-        
-        if (typeof value === 'string' && (value.includes(':') || value.includes('#') || value.includes('\n'))) {
+
+        if (typeof value === "string" && (value.includes(":") || value.includes("#") || value.includes("\n"))) {
             return `${key}: "${value.replace(/"/g, '\\"')}"`;
         }
-        
-        if (typeof value === 'boolean' || typeof value === 'number') {
+
+        if (typeof value === "boolean" || typeof value === "number") {
             return `${key}: ${value}`;
         }
-        
+
         if (value === null || value === undefined) {
             return `${key}: null`;
         }
-        
+
         return `${key}: ${value}`;
     }
 
@@ -62,20 +62,20 @@ export class MetadataLinkParser {
         try {
             const content = await this.app.vault.read(file);
             const frontMatterInfo = getFrontMatterInfo(content);
-            
+
             if (!frontMatterInfo.exists) {
                 return false;
             }
 
             const frontmatterText = content.substring(
                 frontMatterInfo.from,
-                frontMatterInfo.to
+                frontMatterInfo.to,
             );
 
             const frontmatter = parseYaml(frontmatterText);
             return frontmatter?.article_processed === true;
         } catch (error) {
-            console.error('Error checking if file is processed:', error);
+            console.error("Error checking if file is processed:", error);
             return false;
         }
     }
@@ -87,7 +87,7 @@ export class MetadataLinkParser {
         try {
             const content = await this.app.vault.read(file);
             const frontMatterInfo = getFrontMatterInfo(content);
-            
+
             if (!frontMatterInfo.exists) {
                 // Add new frontmatter
                 const newContent = `---\narticle_processed: true\n---\n\n${content}`;
@@ -96,25 +96,25 @@ export class MetadataLinkParser {
                 // Update existing frontmatter
                 const frontmatterText = content.substring(
                     frontMatterInfo.from,
-                    frontMatterInfo.to
+                    frontMatterInfo.to,
                 );
                 const frontmatter = parseYaml(frontmatterText);
-                
+
                 // Only add if not already present
                 if (frontmatter?.article_processed !== true) {
                     const updatedFrontmatter = { ...frontmatter, article_processed: true };
                     const yamlLines = Object.entries(updatedFrontmatter)
                         .map(([key, value]) => this.serializeYamlValue(key, value));
-                    const newFrontmatter = `---\n${yamlLines.join('\n')}\n---\n`;
-                    
+                    const newFrontmatter = `---\n${yamlLines.join("\n")}\n---\n`;
+
                     const afterFrontmatter = content.substring(frontMatterInfo.contentStart ?? frontMatterInfo.to);
                     const newContent = newFrontmatter + afterFrontmatter;
-                    
+
                     await this.app.vault.modify(file, newContent);
                 }
             }
         } catch (error) {
-            console.error('Error marking file as processed:', error);
+            console.error("Error marking file as processed:", error);
         }
     }
 
@@ -124,28 +124,28 @@ export class MetadataLinkParser {
      */
     private extractUrlFromFrontmatter(fileContent: string): string | null {
         const frontMatterInfo = getFrontMatterInfo(fileContent);
-        
+
         if (!frontMatterInfo.exists) {
             return null;
         }
 
         const frontmatterText = fileContent.substring(
             frontMatterInfo.from,
-            frontMatterInfo.to
+            frontMatterInfo.to,
         );
 
         try {
             const frontmatter = parseYaml(frontmatterText);
-            
+
             // Check common URL field names
-            const urlFields = ['url', 'link', 'source', 'web_url', 'article_url'];
+            const urlFields = ["url", "link", "source", "web_url", "article_url"];
             for (const field of urlFields) {
                 if (frontmatter && frontmatter[field]) {
                     return frontmatter[field];
                 }
             }
         } catch (error) {
-            console.error('Error extracting URL from frontmatter:', error);
+            console.error("Error extracting URL from frontmatter:", error);
         }
 
         return null;
@@ -158,7 +158,7 @@ export class MetadataLinkParser {
         // Match markdown links [text](url)
         const markdownLinkRegex = /\[([^\]]+)\]\(([^)]+)\)/;
         const match = content.match(markdownLinkRegex);
-        
+
         if (match && match[2]) {
             return match[2];
         }
@@ -166,7 +166,7 @@ export class MetadataLinkParser {
         // Match plain URLs
         const urlRegex = /(https?:\/\/[^\s]+)/;
         const urlMatch = content.match(urlRegex);
-        
+
         if (urlMatch && urlMatch[1]) {
             return urlMatch[1];
         }
@@ -184,12 +184,12 @@ export class MetadataLinkParser {
         }
 
         const result = await this.urlTransformer.transformUrl(url, this.transformationConfig.rules);
-        
+
         return {
             url: result.transformedUrl,
             originalUrl: result.originalUrl,
             appliedRule: result.appliedRule,
-            error: result.error
+            error: result.error,
         };
     }
 
@@ -200,7 +200,7 @@ export class MetadataLinkParser {
         try {
             const content = await this.app.vault.read(file);
             const frontMatterInfo = getFrontMatterInfo(content);
-            
+
             if (!frontMatterInfo.exists) {
                 const newFrontmatter = `---\noriginal_url: ${originalUrl}\nproxied_url: ${proxiedUrl}\nproxy_rule: "${proxyRule}"\n---\n\n`;
                 const newContent = newFrontmatter + content;
@@ -208,28 +208,28 @@ export class MetadataLinkParser {
             } else {
                 const frontmatterText = content.substring(
                     frontMatterInfo.from,
-                    frontMatterInfo.to
+                    frontMatterInfo.to,
                 );
                 const frontmatter = parseYaml(frontmatterText);
-                
+
                 const updatedFrontmatter = {
                     ...frontmatter,
                     original_url: originalUrl,
                     proxied_url: proxiedUrl,
-                    proxy_rule: proxyRule
+                    proxy_rule: proxyRule,
                 };
-                
+
                 const yamlLines = Object.entries(updatedFrontmatter)
                     .map(([key, value]) => this.serializeYamlValue(key, value));
-                const newFrontmatter = `---\n${yamlLines.join('\n')}\n---\n`;
-                
+                const newFrontmatter = `---\n${yamlLines.join("\n")}\n---\n`;
+
                 const afterFrontmatter = content.substring(frontMatterInfo.contentStart ?? frontMatterInfo.to);
                 const newContent = newFrontmatter + afterFrontmatter;
-                
+
                 await this.app.vault.modify(file, newContent);
             }
         } catch (error) {
-            console.error('Error updating frontmatter with proxy info:', error);
+            console.error("Error updating frontmatter with proxy info:", error);
         }
     }
 
@@ -240,10 +240,10 @@ export class MetadataLinkParser {
     async processFile(file: TFile): Promise<void> {
         try {
             const content = await this.app.vault.read(file);
-            
+
             // Try to extract URL from frontmatter first
             let url = this.extractUrlFromFrontmatter(content);
-            
+
             // If not found in frontmatter, try content
             if (!url) {
                 url = this.extractUrlFromContent(content);
@@ -256,7 +256,7 @@ export class MetadataLinkParser {
             }
 
             const transformResult = await this.transformUrlIfNeeded(url);
-            
+
             if (!transformResult.url) {
                 new Notice(`Proxy unavailable: ${transformResult.appliedRule}. Skipping article: ${file.name}`);
                 console.warn(`Skipping ${file.path} - ${transformResult.error}`);
@@ -272,10 +272,10 @@ export class MetadataLinkParser {
             }
 
             await this.readItLaterApi.processContent(urlToProcess);
-            
+
             new Notice(`Successfully processed article from: ${urlToProcess}`);
         } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            const errorMessage = error instanceof Error ? error.message : "Unknown error";
             new Notice(`Error processing file: ${errorMessage}`);
             console.error(`Error processing file ${file.path}:`, error);
         }
@@ -285,12 +285,12 @@ export class MetadataLinkParser {
      * Process a file and append the retrieved article content to the existing file
      * instead of creating a new note.
      * Uses ReadItLater plugin's parser if available for better markdown generation.
-     * 
+     *
      * @param file - The file to process
      * @param checkProcessed - If true, checks if file was already processed (for batch operations)
      * @param minContentRatio - If provided, only append if fetched content is this many times longer than existing
      */
-    async processFileAndAppend(file: TFile, checkProcessed: boolean = false, minContentRatio?: number): Promise<void> {
+    async processFileAndAppend(file: TFile, checkProcessed = false, minContentRatio?: number): Promise<void> {
         try {
             // Check if already processed (only in batch mode)
             if (checkProcessed && await this.isFileProcessed(file)) {
@@ -299,10 +299,10 @@ export class MetadataLinkParser {
             }
 
             const content = await this.app.vault.read(file);
-            
+
             // Try to extract URL from frontmatter first
             let url = this.extractUrlFromFrontmatter(content);
-            
+
             // If not found in frontmatter, try content
             if (!url) {
                 url = this.extractUrlFromContent(content);
@@ -315,7 +315,7 @@ export class MetadataLinkParser {
             }
 
             const transformResult = await this.transformUrlIfNeeded(url);
-            
+
             if (!transformResult.url) {
                 new Notice(`Proxy unavailable: ${transformResult.appliedRule}. Skipping article: ${file.name}`);
                 console.warn(`Skipping ${file.path} - ${transformResult.error}`);
@@ -332,7 +332,7 @@ export class MetadataLinkParser {
             }
 
             const articleMarkdown = await this.readItLaterApi.getMarkdownContent(urlToFetch);
-            
+
             if (!articleMarkdown) {
                 new Notice(`Failed to fetch content from: ${urlToFetch}`);
                 return;
@@ -359,18 +359,18 @@ export class MetadataLinkParser {
                 await this.updateFrontmatterWithProxyInfo(file, originalUrl, urlToFetch, transformResult.appliedRule);
             }
 
-            const separator = '\n\n---\n\n## Retrieved Article Content\n\n';
+            const separator = "\n\n---\n\n## Retrieved Article Content\n\n";
             const contentToAppend = separator + articleMarkdown;
-            
+
             await this.app.vault.append(file, contentToAppend);
-            
+
             if (checkProcessed) {
                 await this.markFileAsProcessed(file);
             }
-            
+
             new Notice(`Successfully appended article content to: ${file.name}`);
         } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            const errorMessage = error instanceof Error ? error.message : "Unknown error";
             new Notice(`Error processing file: ${errorMessage}`);
             console.error(`Error processing file ${file.path}:`, error);
         }
@@ -382,7 +382,7 @@ export class MetadataLinkParser {
      */
     async processFolderFiles(folderPath: string): Promise<void> {
         const files = this.app.vault.getMarkdownFiles().filter(
-            (file: TFile) => file.path.startsWith(folderPath)
+            (file: TFile) => file.path.startsWith(folderPath),
         );
 
         if (files.length === 0) {
@@ -404,9 +404,9 @@ export class MetadataLinkParser {
      */
     async processActiveFile(): Promise<void> {
         const activeFile = this.app.workspace.getActiveFile();
-        
+
         if (!activeFile) {
-            new Notice('No active file found');
+            new Notice("No active file found");
             return;
         }
 
@@ -418,9 +418,9 @@ export class MetadataLinkParser {
      */
     async processActiveFileAndAppend(): Promise<void> {
         const activeFile = this.app.workspace.getActiveFile();
-        
+
         if (!activeFile) {
-            new Notice('No active file found');
+            new Notice("No active file found");
             return;
         }
 
@@ -430,13 +430,13 @@ export class MetadataLinkParser {
     /**
      * Process all files in a folder and append content to each
      * Skips files that have already been processed (have article_processed: true)
-     * 
+     *
      * @param folderPath - The folder path to process
      * @param minContentRatio - If provided, only append if fetched content is this many times longer than existing
      */
     async processFolderFilesAndAppend(folderPath: string, minContentRatio?: number): Promise<void> {
         const files = this.app.vault.getMarkdownFiles().filter(
-            (file: TFile) => file.path.startsWith(folderPath)
+            (file: TFile) => file.path.startsWith(folderPath),
         );
 
         if (files.length === 0) {
@@ -455,10 +455,10 @@ export class MetadataLinkParser {
                 skippedCount++;
                 continue;
             }
-            
+
             // Pass checkProcessed: true to enable tracking and minContentRatio if provided
             await this.processFileAndAppend(file, true, minContentRatio);
-            
+
             // Only increment processedCount if file was actually processed
             // (processFileAndAppend will mark as processed if successful)
             const nowProcessed = await this.isFileProcessed(file);
@@ -523,10 +523,10 @@ export class MetadataLinkParser {
                     await this.updateFrontmatterWithProxyInfo(file, transformResult.originalUrl, transformResult.url, transformResult.appliedRule);
                 }
 
-                const separator = '\n\n---\n\n## Retrieved Article Content\n\n';
+                const separator = "\n\n---\n\n## Retrieved Article Content\n\n";
                 await this.app.vault.append(file, separator + articleMarkdown);
                 await this.markFileAsProcessed(file);
-                
+
                 console.log(`Auto-processed ${file.path}: ratio ${ratio.toFixed(2)} >= ${minContentRatio}`);
                 return true;
             }
@@ -543,7 +543,7 @@ export class MetadataLinkParser {
      */
     async autoProcessFolder(folderPath: string, minContentRatio: number): Promise<{ processed: number; skipped: number }> {
         const files = this.app.vault.getMarkdownFiles().filter(
-            (file: TFile) => file.path.startsWith(folderPath)
+            (file: TFile) => file.path.startsWith(folderPath),
         );
 
         let processed = 0;
@@ -569,12 +569,12 @@ export class MetadataLinkParser {
         try {
             const content = await this.app.vault.read(file);
             const urls = content
-                .split('\n')
+                .split("\n")
                 .map((line: string) => line.trim())
                 .filter((line: string) => line.match(/^https?:\/\//));
 
             if (urls.length === 0) {
-                new Notice('No URLs found in file');
+                new Notice("No URLs found in file");
                 return;
             }
 
@@ -586,7 +586,7 @@ export class MetadataLinkParser {
 
             for (const url of urls) {
                 const transformResult = await this.transformUrlIfNeeded(url);
-                
+
                 if (!transformResult.url) {
                     if (transformResult.appliedRule && !downProxies.has(transformResult.appliedRule)) {
                         downProxies.add(transformResult.appliedRule);
@@ -600,22 +600,22 @@ export class MetadataLinkParser {
             }
 
             if (transformedUrls.length === 0) {
-                new Notice('All URLs skipped due to proxy unavailability');
+                new Notice("All URLs skipped due to proxy unavailability");
                 return;
             }
 
-            const urlBatch = transformedUrls.join('\n');
+            const urlBatch = transformedUrls.join("\n");
             await this.readItLaterApi.processContentBatch(urlBatch);
 
             const message = skippedUrls.length > 0
                 ? `Processed ${transformedUrls.length} URLs, skipped ${skippedUrls.length} due to proxy issues`
                 : `Successfully processed ${transformedUrls.length} URLs`;
-            
+
             new Notice(message);
         } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            const errorMessage = error instanceof Error ? error.message : "Unknown error";
             new Notice(`Error processing URL batch: ${errorMessage}`);
-            console.error('Error processing URL batch:', error);
+            console.error("Error processing URL batch:", error);
         }
     }
 }
@@ -641,9 +641,9 @@ export async function parseMetadataLinkAndAppend(app: App, noteService: NoteServ
  * Example usage for batch processing
  */
 export async function parseMetadataLinksInFolder(
-    app: App, 
-    noteService: NoteService, 
-    folderPath: string
+    app: App,
+    noteService: NoteService,
+    folderPath: string,
 ) {
     const parser = new MetadataLinkParser(app, noteService);
     await parser.processFolderFiles(folderPath);

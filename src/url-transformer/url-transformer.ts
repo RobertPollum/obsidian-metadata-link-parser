@@ -1,14 +1,14 @@
-import { requestUrl } from 'obsidian';
-import { TransformationRule, TransformationResult, ProxyHealthCache } from './transformation-types';
+import { requestUrl } from "obsidian";
+import { TransformationRule, TransformationResult, ProxyHealthCache } from "./transformation-types";
 
-const TEST_URL = 'https://example.com/test';
+const TEST_URL = "https://example.com/test";
 
 export class UrlTransformer {
     private healthCache: ProxyHealthCache = {};
     private cacheTtlMs: number;
     private timeoutMs: number;
 
-    constructor(cacheTtlMinutes: number = 5, timeoutMs: number = 5000) {
+    constructor(cacheTtlMinutes = 5, timeoutMs = 5000) {
         this.cacheTtlMs = cacheTtlMinutes * 60 * 1000;
         this.timeoutMs = timeoutMs;
     }
@@ -18,18 +18,18 @@ export class UrlTransformer {
             const urlObj = new URL(url);
             const hostname = urlObj.hostname;
 
-            if (pattern === '*') {
+            if (pattern === "*") {
                 return true;
             }
 
-            if (pattern.startsWith('*.')) {
+            if (pattern.startsWith("*.")) {
                 const domain = pattern.substring(2);
-                return hostname === domain || hostname.endsWith('.' + domain);
+                return hostname === domain || hostname.endsWith("." + domain);
             }
 
             return hostname === pattern;
         } catch (error) {
-            console.error('Error matching pattern:', error);
+            console.error("Error matching pattern:", error);
             return false;
         }
     }
@@ -44,7 +44,7 @@ export class UrlTransformer {
 
     private findMatchingRule(url: string, rules: TransformationRule[]): TransformationRule | null {
         const matchingRules = rules.filter(rule => this.matchesRule(url, rule));
-        
+
         if (matchingRules.length === 0) {
             return null;
         }
@@ -57,26 +57,26 @@ export class UrlTransformer {
         const template = rule.template;
 
         switch (rule.transformationType) {
-            case 'prefix':
-                return template.replace('{url}', url);
-            
-            case 'path-extraction':
+            case "prefix":
+                return template.replace("{url}", url);
+
+            case "path-extraction":
                 try {
                     const urlObj = new URL(url);
                     const path = urlObj.pathname + urlObj.search + urlObj.hash;
                     const domain = urlObj.hostname;
-                    
+
                     return template
-                        .replace('{url}', url)
-                        .replace('{path}', path)
-                        .replace('{domain}', domain);
+                        .replace("{url}", url)
+                        .replace("{path}", path)
+                        .replace("{domain}", domain);
                 } catch (error) {
-                    console.error('Error extracting path:', error);
-                    return template.replace('{url}', url);
+                    console.error("Error extracting path:", error);
+                    return template.replace("{url}", url);
                 }
-            
+
             default:
-                return template.replace('{url}', url);
+                return template.replace("{url}", url);
         }
     }
 
@@ -85,7 +85,7 @@ export class UrlTransformer {
             const urlObj = new URL(transformedUrl);
             return `${urlObj.protocol}//${urlObj.hostname}`;
         } catch (error) {
-            console.error('Error extracting proxy base URL:', error);
+            console.error("Error extracting proxy base URL:", error);
             return transformedUrl;
         }
     }
@@ -107,7 +107,7 @@ export class UrlTransformer {
         try {
             const response = await requestUrl({
                 url: url,
-                method: 'HEAD',
+                method: "HEAD",
             });
 
             clearTimeout(timeoutId);
@@ -133,7 +133,7 @@ export class UrlTransformer {
 
         this.healthCache[proxyBaseUrl] = {
             healthy,
-            lastChecked: Date.now()
+            lastChecked: Date.now(),
         };
 
         return healthy;
@@ -146,7 +146,7 @@ export class UrlTransformer {
             return {
                 transformedUrl: url,
                 originalUrl: url,
-                proxyHealthy: true
+                proxyHealthy: true,
             };
         }
 
@@ -161,7 +161,7 @@ export class UrlTransformer {
                 originalUrl: url,
                 appliedRule: matchingRule.name,
                 proxyHealthy: false,
-                error: `Proxy service "${matchingRule.name}" is currently unavailable`
+                error: `Proxy service "${matchingRule.name}" is currently unavailable`,
             };
         }
 
@@ -169,7 +169,7 @@ export class UrlTransformer {
             transformedUrl,
             originalUrl: url,
             appliedRule: matchingRule.name,
-            proxyHealthy: true
+            proxyHealthy: true,
         };
     }
 
@@ -179,7 +179,7 @@ export class UrlTransformer {
 
     async testAllProxies(rules: TransformationRule[]): Promise<Map<string, boolean>> {
         const results = new Map<string, boolean>();
-        
+
         for (const rule of rules) {
             if (!rule.enabled) {
                 continue;
@@ -187,9 +187,9 @@ export class UrlTransformer {
 
             const testUrl = this.applyTransformation(TEST_URL, rule);
             const proxyBaseUrl = this.extractProxyBaseUrl(testUrl);
-            
+
             delete this.healthCache[proxyBaseUrl];
-            
+
             const healthy = await this.checkProxyHealth(proxyBaseUrl, rule);
             results.set(rule.name, healthy);
         }

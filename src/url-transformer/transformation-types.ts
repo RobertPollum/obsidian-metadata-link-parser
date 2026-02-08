@@ -1,4 +1,4 @@
-export type TransformationType = 'prefix' | 'path-extraction';
+export type TransformationType = "prefix" | "path-extraction";
 
 export interface TransformationRule {
     id: string;

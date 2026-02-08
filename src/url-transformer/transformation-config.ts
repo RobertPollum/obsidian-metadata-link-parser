@@ -1,6 +1,6 @@
-import { App, Plugin } from 'obsidian';
-import { TransformationConfig, TransformationRule, AutoProcessingConfig } from './transformation-types';
-import { getDefaultTransformationRules } from './default-templates';
+import { App, Plugin } from "obsidian";
+import { TransformationConfig, TransformationRule, AutoProcessingConfig } from "./transformation-types";
+import { getDefaultTransformationRules } from "./default-templates";
 
 export class TransformationConfigManager {
     private app: App;
@@ -15,9 +15,9 @@ export class TransformationConfigManager {
     getDefaultAutoProcessingConfig(): AutoProcessingConfig {
         return {
             enabled: false,
-            folderPath: '',
+            folderPath: "",
             frequencyMinutes: 60,
-            minContentLengthRatio: 2.0
+            minContentLengthRatio: 2.0,
         };
     }
 
@@ -26,14 +26,14 @@ export class TransformationConfigManager {
             rules: getDefaultTransformationRules(),
             proxyHealthCacheTtlMinutes: 5,
             proxyHealthTimeoutMs: 5000,
-            autoProcessing: this.getDefaultAutoProcessingConfig()
+            autoProcessing: this.getDefaultAutoProcessingConfig(),
         };
     }
 
     async loadConfig(): Promise<TransformationConfig> {
         try {
             const loadedData = await this.plugin.loadData();
-            
+
             if (!loadedData || !loadedData.transformationConfig) {
                 const defaultConfig = this.getDefaultConfig();
                 await this.saveConfig(defaultConfig);
@@ -46,7 +46,7 @@ export class TransformationConfigManager {
             this.config = mergedConfig;
             return mergedConfig;
         } catch (error) {
-            console.error('Error loading transformation config:', error);
+            console.error("Error loading transformation config:", error);
             const defaultConfig = this.getDefaultConfig();
             this.config = defaultConfig;
             return defaultConfig;
@@ -69,8 +69,8 @@ export class TransformationConfigManager {
                 enabled: loadedConfig.autoProcessing?.enabled ?? defaultAutoProcessing.enabled,
                 folderPath: loadedConfig.autoProcessing?.folderPath ?? defaultAutoProcessing.folderPath,
                 frequencyMinutes: loadedConfig.autoProcessing?.frequencyMinutes ?? defaultAutoProcessing.frequencyMinutes,
-                minContentLengthRatio: loadedConfig.autoProcessing?.minContentLengthRatio ?? defaultAutoProcessing.minContentLengthRatio
-            }
+                minContentLengthRatio: loadedConfig.autoProcessing?.minContentLengthRatio ?? defaultAutoProcessing.minContentLengthRatio,
+            },
         };
     }
 
@@ -81,14 +81,14 @@ export class TransformationConfigManager {
             await this.plugin.saveData(currentData);
             this.config = config;
         } catch (error) {
-            console.error('Error saving transformation config:', error);
+            console.error("Error saving transformation config:", error);
             throw error;
         }
     }
 
     getConfig(): TransformationConfig {
         if (!this.config) {
-            throw new Error('Config not loaded. Call loadConfig() first.');
+            throw new Error("Config not loaded. Call loadConfig() first.");
         }
         return this.config;
     }
@@ -102,7 +102,7 @@ export class TransformationConfigManager {
     async updateRule(ruleId: string, updates: Partial<TransformationRule>): Promise<void> {
         const config = this.getConfig();
         const ruleIndex = config.rules.findIndex(r => r.id === ruleId);
-        
+
         if (ruleIndex === -1) {
             throw new Error(`Rule with id ${ruleId} not found`);
         }
@@ -124,13 +124,13 @@ export class TransformationConfigManager {
     async reorderRules(ruleIds: string[]): Promise<void> {
         const config = this.getConfig();
         const ruleMap = new Map(config.rules.map(r => [r.id, r]));
-        
+
         const reorderedRules = ruleIds
             .map(id => ruleMap.get(id))
             .filter((r): r is TransformationRule => r !== undefined);
 
         const missingRules = config.rules.filter(r => !ruleIds.includes(r.id));
-        
+
         config.rules = [...reorderedRules, ...missingRules];
         await this.saveConfig(config);
     }

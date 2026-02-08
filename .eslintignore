@@ -1,0 +1,7 @@
+node_modules/
+main.js
+*.config.js
+*.config.mjs
+.github/
+dist/
+build/

@@ -1,9 +1,9 @@
-import { App, Notice, Editor } from 'obsidian';
+import { App, Notice, Editor } from "obsidian";
 
 /**
  * Stub implementation of NoteService that can be replaced by the actual
  * ReadItLater plugin's NoteService when available.
- * 
+ *
  * This provides basic functionality to create notes from URLs without
  * requiring the full ReadItLater plugin to be installed.
  */
@@ -19,15 +19,15 @@ export class NoteService {
         try {
             // Check if content is a URL
             const isUrl = content.match(/^https?:\/\//);
-            
+
             if (isUrl) {
                 await this.createNoteFromUrl(content);
             } else {
                 await this.createNoteFromText(content);
             }
         } catch (error) {
-            console.error('Error creating note:', error);
-            new Notice('Failed to create note from content');
+            console.error("Error creating note:", error);
+            new Notice("Failed to create note from content");
         }
     }
 
@@ -36,8 +36,8 @@ export class NoteService {
      * Expects content to be delimited by newlines
      */
     async createNotesFromBatch(contentBatch: string): Promise<void> {
-        const items = contentBatch.split('\n').filter(line => line.trim());
-        
+        const items = contentBatch.split("\n").filter(line => line.trim());
+
         for (const item of items) {
             await this.createNote(item.trim());
         }
@@ -49,7 +49,7 @@ export class NoteService {
     async insertContentAtEditorCursorPosition(content: string, editor: Editor): Promise<void> {
         try {
             const isUrl = content.match(/^https?:\/\//);
-            
+
             if (isUrl) {
                 // Fetch and insert article content
                 const articleContent = await this.fetchArticleContent(content);
@@ -62,8 +62,8 @@ export class NoteService {
                 editor.replaceSelection(content);
             }
         } catch (error) {
-            console.error('Error inserting content:', error);
-            new Notice('Failed to insert content');
+            console.error("Error inserting content:", error);
+            new Notice("Failed to insert content");
         }
     }
 
@@ -74,7 +74,7 @@ export class NoteService {
     async getMarkdownContent(content: string): Promise<string | null> {
         try {
             const isUrl = content.match(/^https?:\/\//);
-            
+
             if (isUrl) {
                 // Fetch article content as markdown
                 return await this.fetchArticleContent(content);
@@ -83,8 +83,8 @@ export class NoteService {
                 return content;
             }
         } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            console.error('Error getting markdown content:', errorMessage);
+            const errorMessage = error instanceof Error ? error.message : "Unknown error";
+            console.error("Error getting markdown content:", errorMessage);
             return null;
         }
     }
@@ -94,11 +94,11 @@ export class NoteService {
      */
     private async createNoteFromUrl(url: string): Promise<void> {
         new Notice(`Fetching content from: ${url}`);
-        
+
         const content = await this.fetchArticleContent(url);
-        
+
         if (!content) {
-            new Notice('Failed to fetch article content');
+            new Notice("Failed to fetch article content");
             return;
         }
 
@@ -115,7 +115,7 @@ export class NoteService {
      * Create a note from plain text
      */
     private async createNoteFromText(text: string): Promise<void> {
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
         const filename = `Note-${timestamp}`;
         const notePath = `${filename}.md`;
 
@@ -132,13 +132,13 @@ export class NoteService {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            
+
             const html = await response.text();
             const plainText = this.extractTextFromHtml(html);
-            
+
             return `# Article from ${url}\n\n**Source:** ${url}\n\n${plainText}`;
         } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            const errorMessage = error instanceof Error ? error.message : "Unknown error";
             console.error(`Error fetching article from ${url}:`, errorMessage);
             return null;
         }
@@ -149,30 +149,30 @@ export class NoteService {
      */
     private extractTextFromHtml(html: string): string {
         // Remove script and style elements
-        let text = html.replace(/<script[^>]*>([\s\S]*?)<\/script>/gi, '');
-        text = text.replace(/<style[^>]*>([\s\S]*?)<\/style>/gi, '');
-        
+        let text = html.replace(/<script[^>]*>([\s\S]*?)<\/script>/gi, "");
+        text = text.replace(/<style[^>]*>([\s\S]*?)<\/style>/gi, "");
+
         // Remove HTML tags
-        text = text.replace(/<[^>]+>/g, ' ');
-        
+        text = text.replace(/<[^>]+>/g, " ");
+
         // Decode HTML entities
-        text = text.replace(/&nbsp;/g, ' ');
+        text = text.replace(/&nbsp;/g, " ");
         text = text.replace(/&quot;/g, '"');
         text = text.replace(/&apos;/g, "'");
-        text = text.replace(/&amp;/g, '&');
-        text = text.replace(/&lt;/g, '<');
-        text = text.replace(/&gt;/g, '>');
-        
+        text = text.replace(/&amp;/g, "&");
+        text = text.replace(/&lt;/g, "<");
+        text = text.replace(/&gt;/g, ">");
+
         // Clean up whitespace
-        text = text.replace(/\s+/g, ' ');
+        text = text.replace(/\s+/g, " ");
         text = text.trim();
-        
+
         // Limit length to avoid huge notes
         const maxLength = 50000;
         if (text.length > maxLength) {
-            text = text.substring(0, maxLength) + '\n\n[Content truncated...]';
+            text = text.substring(0, maxLength) + "\n\n[Content truncated...]";
         }
-        
+
         return text;
     }
 
@@ -182,16 +182,16 @@ export class NoteService {
     private generateFilenameFromUrl(url: string): string {
         try {
             const urlObj = new URL(url);
-            let filename = urlObj.hostname.replace(/^www\./, '') + urlObj.pathname;
-            
+            let filename = urlObj.hostname.replace(/^www\./, "") + urlObj.pathname;
+
             // Clean up the filename
             filename = filename
-                .replace(/[^a-zA-Z0-9-_]/g, '-')
-                .replace(/-+/g, '-')
-                .replace(/^-|-$/g, '')
+                .replace(/[^a-zA-Z0-9-_]/g, "-")
+                .replace(/-+/g, "-")
+                .replace(/^-|-$/g, "")
                 .substring(0, 100); // Limit length
-            
-            return filename || 'article';
+
+            return filename || "article";
         } catch {
             return `article-${Date.now()}`;
         }
@@ -240,7 +240,7 @@ export class ReadItLaterApi {
  */
 export function isReadItLaterInstalled(app: App): boolean {
     // @ts-ignore - accessing internal plugin structure
-    return app.plugins?.plugins?.['obsidian-read-it-later'] !== undefined;
+    return app.plugins?.plugins?.["obsidian-read-it-later"] !== undefined;
 }
 
 /**
@@ -248,12 +248,12 @@ export function isReadItLaterInstalled(app: App): boolean {
  */
 class EnhancedNoteService extends NoteService {
     private readItLaterNoteService: any;
-    
+
     constructor(app: App, readItLaterNoteService?: any) {
         super(app);
         this.readItLaterNoteService = readItLaterNoteService;
     }
-    
+
     /**
      * Override getMarkdownContent to use ReadItLater's parser when available
      */
@@ -267,20 +267,20 @@ class EnhancedNoteService extends NoteService {
                     // @ts-ignore
                     const note = await this.readItLaterNoteService.makeNote(content);
                     if (note && note.content) {
-                        console.log('Using ReadItLater parser for markdown generation');
+                        console.log("Using ReadItLater parser for markdown generation");
                         return note.content;
                     }
                 }
             } catch (error) {
-                console.warn('Failed to use ReadItLater parser, falling back to basic parsing:', error);
+                console.warn("Failed to use ReadItLater parser, falling back to basic parsing:", error);
             }
         }
-        
+
         // Fall back to basic HTML parsing
-        console.log('Using basic HTML parser for markdown generation');
+        console.log("Using basic HTML parser for markdown generation");
         return await super.getMarkdownContent(content);
     }
-    
+
     /**
      * Use ReadItLater's createNote if available
      */
@@ -290,12 +290,12 @@ class EnhancedNoteService extends NoteService {
                 await this.readItLaterNoteService.createNote(content);
                 return;
             } catch (error) {
-                console.warn('Failed to use ReadItLater createNote:', error);
+                console.warn("Failed to use ReadItLater createNote:", error);
             }
         }
         await super.createNote(content);
     }
-    
+
     /**
      * Use ReadItLater's batch processing if available
      */
@@ -305,7 +305,7 @@ class EnhancedNoteService extends NoteService {
                 await this.readItLaterNoteService.createNotesFromBatch(contentBatch);
                 return;
             } catch (error) {
-                console.warn('Failed to use ReadItLater batch processing:', error);
+                console.warn("Failed to use ReadItLater batch processing:", error);
             }
         }
         await super.createNotesFromBatch(contentBatch);
@@ -320,19 +320,19 @@ export function getNoteService(app: App): NoteService {
     if (isReadItLaterInstalled(app)) {
         try {
             // @ts-ignore - accessing internal plugin structure
-            const readItLaterPlugin = app.plugins.plugins['obsidian-read-it-later'];
-            
+            const readItLaterPlugin = app.plugins.plugins["obsidian-read-it-later"];
+
             // If the plugin exposes a NoteService, use enhanced wrapper
             if (readItLaterPlugin.noteService) {
-                console.log('Using ReadItLater plugin with enhanced wrapper');
+                console.log("Using ReadItLater plugin with enhanced wrapper");
                 return new EnhancedNoteService(app, readItLaterPlugin.noteService);
             }
         } catch (error) {
-            console.warn('ReadItLater plugin found but could not access NoteService:', error);
+            console.warn("ReadItLater plugin found but could not access NoteService:", error);
         }
     }
-    
+
     // Fall back to stub implementation
-    console.log('Using stub NoteService implementation');
+    console.log("Using stub NoteService implementation");
     return new NoteService(app);
 }
