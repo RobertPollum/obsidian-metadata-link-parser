@@ -190,14 +190,15 @@ export default class MetadataLinkParserPlugin extends Plugin {
 
     private startAutoProcessing(): void {
         const config = this.configManager.getConfig();
+        const folders = config.autoProcessing.folderPaths.filter(f => f.trim().length > 0);
 
-        if (!config.autoProcessing.enabled || !config.autoProcessing.folderPath) {
+        if (!config.autoProcessing.enabled || folders.length === 0) {
             return;
         }
 
         const intervalMs = config.autoProcessing.frequencyMinutes * 60 * 1000;
 
-        console.log(`Auto-processing enabled: checking "${config.autoProcessing.folderPath}" every ${config.autoProcessing.frequencyMinutes} minutes`);
+        console.log(`Auto-processing enabled: checking [${folders.join(", ")}] every ${config.autoProcessing.frequencyMinutes} minutes`);
 
         this.autoProcessingIntervalId = window.setInterval(async () => {
             await this.runAutoProcessing();
@@ -220,21 +221,28 @@ export default class MetadataLinkParserPlugin extends Plugin {
 
     private async runAutoProcessing(): Promise<void> {
         const config = this.configManager.getConfig();
+        const folders = config.autoProcessing.folderPaths.filter(f => f.trim().length > 0);
 
-        if (!config.autoProcessing.enabled || !config.autoProcessing.folderPath) {
+        if (!config.autoProcessing.enabled || folders.length === 0) {
             return;
         }
 
-        console.log(`Running auto-processing for folder: ${config.autoProcessing.folderPath}`);
-
         const parser = this.createParser();
-        const result = await parser.autoProcessFolder(
-            config.autoProcessing.folderPath,
-            config.autoProcessing.minContentLengthRatio,
-        );
+        let totalProcessed = 0;
+        let totalSkipped = 0;
 
-        if (result.processed > 0) {
-            console.log(`Auto-processing complete: ${result.processed} files updated, ${result.skipped} skipped`);
+        for (const folderPath of folders) {
+            console.log(`Running auto-processing for folder: ${folderPath}`);
+            const result = await parser.autoProcessFolder(
+                folderPath,
+                config.autoProcessing.minContentLengthRatio,
+            );
+            totalProcessed += result.processed;
+            totalSkipped += result.skipped;
+        }
+
+        if (totalProcessed > 0) {
+            console.log(`Auto-processing complete: ${totalProcessed} files updated, ${totalSkipped} skipped`);
         }
     }
 

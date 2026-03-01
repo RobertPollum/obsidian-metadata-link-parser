@@ -15,7 +15,7 @@ export class TransformationConfigManager {
     getDefaultAutoProcessingConfig(): AutoProcessingConfig {
         return {
             enabled: false,
-            folderPath: "",
+            folderPaths: [],
             frequencyMinutes: 60,
             minContentLengthRatio: 2.0,
         };
@@ -67,7 +67,10 @@ export class TransformationConfigManager {
             proxyHealthTimeoutMs: loadedConfig.proxyHealthTimeoutMs ?? 5000,
             autoProcessing: {
                 enabled: loadedConfig.autoProcessing?.enabled ?? defaultAutoProcessing.enabled,
-                folderPath: loadedConfig.autoProcessing?.folderPath ?? defaultAutoProcessing.folderPath,
+                folderPaths: loadedConfig.autoProcessing?.folderPaths
+                    ?? (loadedConfig.autoProcessing as any)?.folderPath
+                        ? [(loadedConfig.autoProcessing as any).folderPath]
+                        : defaultAutoProcessing.folderPaths,
                 frequencyMinutes: loadedConfig.autoProcessing?.frequencyMinutes ?? defaultAutoProcessing.frequencyMinutes,
                 minContentLengthRatio: loadedConfig.autoProcessing?.minContentLengthRatio ?? defaultAutoProcessing.minContentLengthRatio,
             },

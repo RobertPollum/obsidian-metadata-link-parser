@@ -20,7 +20,7 @@ export interface TransformationResult {
 
 export interface AutoProcessingConfig {
     enabled: boolean;
-    folderPath: string;
+    folderPaths: string[];
     frequencyMinutes: number;
     minContentLengthRatio: number;
 }

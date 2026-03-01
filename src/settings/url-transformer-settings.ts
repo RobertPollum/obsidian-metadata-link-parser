@@ -1,6 +1,6 @@
 import { App, PluginSettingTab, Setting, Notice, Modal } from "obsidian";
 import { TransformationConfigManager } from "../url-transformer/transformation-config";
-import { TransformationRule } from "../url-transformer/transformation-types";
+import { TransformationConfig, TransformationRule } from "../url-transformer/transformation-types";
 import { UrlTransformer } from "../url-transformer/url-transformer";
 
 export class UrlTransformerSettingTab extends PluginSettingTab {
@@ -45,42 +45,91 @@ export class UrlTransformerSettingTab extends PluginSettingTab {
                 }));
 
         new Setting(containerEl)
-            .setName("Watch folder")
-            .setDesc("Folder path to monitor for files with URLs")
-            .addText(text => text
-                .setValue(config.autoProcessing.folderPath)
-                .setPlaceholder("e.g., Articles or Inbox/RSS")
-                .onChange(async (value) => {
-                    config.autoProcessing.folderPath = value;
-                    await this.configManager.saveConfig(config);
-                }));
+            .setName("Watch folders")
+            .setDesc("Folder paths to monitor for files with URLs");
+
+        const foldersContainer = containerEl.createDiv({ cls: "watch-folders-container" });
+        this.displayWatchFolders(foldersContainer, config);
 
         new Setting(containerEl)
             .setName("Check frequency (minutes)")
-            .setDesc("How often to scan the folder for new content")
-            .addSlider(slider => slider
-                .setLimits(5, 360, 5)
-                .setValue(config.autoProcessing.frequencyMinutes)
-                .setDynamicTooltip()
-                .onChange(async (value) => {
-                    config.autoProcessing.frequencyMinutes = value;
-                    await this.configManager.saveConfig(config);
-                    if (this.plugin.restartAutoProcessing) {
-                        this.plugin.restartAutoProcessing();
-                    }
-                }));
+            .setDesc("How often to scan the folders for new content (5–360)")
+            .addText(text => {
+                text.inputEl.type = "number";
+                text.inputEl.min = "5";
+                text.inputEl.max = "360";
+                text.inputEl.step = "5";
+                text.inputEl.style.width = "80px";
+                text.setValue(String(config.autoProcessing.frequencyMinutes))
+                    .onChange(async (value) => {
+                        const num = parseInt(value);
+                        if (!isNaN(num) && num >= 5 && num <= 360) {
+                            config.autoProcessing.frequencyMinutes = num;
+                            await this.configManager.saveConfig(config);
+                            if (this.plugin.restartAutoProcessing) {
+                                this.plugin.restartAutoProcessing();
+                            }
+                        }
+                    });
+            });
 
         new Setting(containerEl)
             .setName("Minimum content ratio")
-            .setDesc("Only append if fetched content is this many times longer than existing (e.g., 2.0 = twice as long)")
-            .addSlider(slider => slider
-                .setLimits(1.5, 10, 0.5)
-                .setValue(config.autoProcessing.minContentLengthRatio)
-                .setDynamicTooltip()
-                .onChange(async (value) => {
-                    config.autoProcessing.minContentLengthRatio = value;
+            .setDesc("Only append if fetched content is this many times longer than existing (e.g., 2.0 = twice as long, range: 1.5–10)")
+            .addText(text => {
+                text.inputEl.type = "number";
+                text.inputEl.min = "1.5";
+                text.inputEl.max = "10";
+                text.inputEl.step = "0.5";
+                text.inputEl.style.width = "80px";
+                text.setValue(String(config.autoProcessing.minContentLengthRatio))
+                    .onChange(async (value) => {
+                        const num = parseFloat(value);
+                        if (!isNaN(num) && num >= 1.5 && num <= 10) {
+                            config.autoProcessing.minContentLengthRatio = num;
+                            await this.configManager.saveConfig(config);
+                        }
+                    });
+            });
+    }
+
+    private displayWatchFolders(container: HTMLElement, config: TransformationConfig): void {
+        container.empty();
+
+        const folderPaths = config.autoProcessing.folderPaths || [];
+
+        for (let i = 0; i < folderPaths.length; i++) {
+            const folderSetting = new Setting(container)
+                .addText(text => text
+                    .setValue(folderPaths[i])
+                    .setPlaceholder("e.g., Articles or Inbox/RSS")
+                    .onChange(async (value) => {
+                        config.autoProcessing.folderPaths[i] = value;
+                        await this.configManager.saveConfig(config);
+                    }))
+                .addButton(button => button
+                    .setButtonText("Remove")
+                    .setWarning()
+                    .onClick(async () => {
+                        config.autoProcessing.folderPaths.splice(i, 1);
+                        await this.configManager.saveConfig(config);
+                        this.displayWatchFolders(container, config);
+                    }));
+            folderSetting.settingEl.style.borderBottom = "none";
+            folderSetting.settingEl.style.padding = "4px 0";
+        }
+
+        const addSetting = new Setting(container)
+            .addButton(button => button
+                .setButtonText("Add folder")
+                .setCta()
+                .onClick(async () => {
+                    config.autoProcessing.folderPaths.push("");
                     await this.configManager.saveConfig(config);
+                    this.displayWatchFolders(container, config);
                 }));
+        addSetting.settingEl.style.borderBottom = "none";
+        addSetting.settingEl.style.padding = "4px 0";
     }
 
     private displayHealthCheckSettings(): void {
@@ -91,27 +140,41 @@ export class UrlTransformerSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName("Cache TTL (minutes)")
-            .setDesc("How long to cache proxy health check results")
-            .addSlider(slider => slider
-                .setLimits(1, 30, 1)
-                .setValue(config.proxyHealthCacheTtlMinutes)
-                .setDynamicTooltip()
-                .onChange(async (value) => {
-                    config.proxyHealthCacheTtlMinutes = value;
-                    await this.configManager.saveConfig(config);
-                }));
+            .setDesc("How long to cache proxy health check results (1–30)")
+            .addText(text => {
+                text.inputEl.type = "number";
+                text.inputEl.min = "1";
+                text.inputEl.max = "30";
+                text.inputEl.step = "1";
+                text.inputEl.style.width = "80px";
+                text.setValue(String(config.proxyHealthCacheTtlMinutes))
+                    .onChange(async (value) => {
+                        const num = parseInt(value);
+                        if (!isNaN(num) && num >= 1 && num <= 30) {
+                            config.proxyHealthCacheTtlMinutes = num;
+                            await this.configManager.saveConfig(config);
+                        }
+                    });
+            });
 
         new Setting(containerEl)
             .setName("Health check timeout (seconds)")
-            .setDesc("Maximum time to wait for proxy health check")
-            .addSlider(slider => slider
-                .setLimits(1, 10, 1)
-                .setValue(config.proxyHealthTimeoutMs / 1000)
-                .setDynamicTooltip()
-                .onChange(async (value) => {
-                    config.proxyHealthTimeoutMs = value * 1000;
-                    await this.configManager.saveConfig(config);
-                }));
+            .setDesc("Maximum time to wait for proxy health check (1–10)")
+            .addText(text => {
+                text.inputEl.type = "number";
+                text.inputEl.min = "1";
+                text.inputEl.max = "10";
+                text.inputEl.step = "1";
+                text.inputEl.style.width = "80px";
+                text.setValue(String(config.proxyHealthTimeoutMs / 1000))
+                    .onChange(async (value) => {
+                        const num = parseInt(value);
+                        if (!isNaN(num) && num >= 1 && num <= 10) {
+                            config.proxyHealthTimeoutMs = num * 1000;
+                            await this.configManager.saveConfig(config);
+                        }
+                    });
+            });
 
         new Setting(containerEl)
             .setName("Test all proxies")
