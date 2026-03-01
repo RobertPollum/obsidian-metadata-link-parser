@@ -68,6 +68,28 @@ Enable scheduled folder monitoring in Settings:
 
 Files are marked with `article_processed: true` in frontmatter after processing to prevent duplicates.
 
+## Releases
+
+This plugin uses automated GitHub Actions for releases:
+
+- **Stable Releases**: Created when version tags are pushed (e.g., `1.2.0`)
+- **Beta Releases**: Triggered by pushes to the `beta` branch or manual workflow dispatch
+- **Nightly Releases**: Automated daily builds (if there are new commits)
+
+For detailed information about creating and managing releases, see [`.github/RELEASE_GUIDE.md`](.github/RELEASE_GUIDE.md).
+
+### Quick Release Commands
+
+```bash
+# Create a stable release
+npm version patch  # or minor/major
+git push && git push --tags
+
+# Create a beta release
+git checkout -b beta
+git push origin beta
+```
+
 ## License
 
 MIT
