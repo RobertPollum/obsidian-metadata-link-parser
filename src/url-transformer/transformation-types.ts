@@ -5,6 +5,7 @@ export interface TransformationRule {
     name: string;
     enabled: boolean;
     matchers: string[];
+    excludeMatchers: string[];
     transformationType: TransformationType;
     template: string;
     priority: number;
@@ -27,6 +28,7 @@ export interface AutoProcessingConfig {
 
 export interface TransformationConfig {
     rules: TransformationRule[];
+    enableProxyFallback: boolean;
     proxyHealthCacheTtlMinutes: number;
     proxyHealthTimeoutMs: number;
     autoProcessing: AutoProcessingConfig;

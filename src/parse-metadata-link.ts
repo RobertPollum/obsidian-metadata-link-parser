@@ -183,7 +183,11 @@ export class MetadataLinkParser {
             return { url, originalUrl: url };
         }
 
-        const result = await this.urlTransformer.transformUrl(url, this.transformationConfig.rules);
+        const result = await this.urlTransformer.transformUrl(
+            url,
+            this.transformationConfig.rules,
+            this.transformationConfig.enableProxyFallback,
+        );
 
         return {
             url: result.transformedUrl,

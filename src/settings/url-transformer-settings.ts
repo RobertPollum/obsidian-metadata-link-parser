@@ -1,6 +1,6 @@
 import { App, PluginSettingTab, Setting, Notice, Modal } from "obsidian";
 import { TransformationConfigManager } from "../url-transformer/transformation-config";
-import { TransformationConfig, TransformationRule } from "../url-transformer/transformation-types";
+import { TransformationConfig, TransformationRule, TransformationType } from "../url-transformer/transformation-types";
 import { UrlTransformer } from "../url-transformer/url-transformer";
 
 export class UrlTransformerSettingTab extends PluginSettingTab {
@@ -139,6 +139,16 @@ export class UrlTransformerSettingTab extends PluginSettingTab {
         containerEl.createEl("h3", { text: "Proxy Health Check" });
 
         new Setting(containerEl)
+            .setName("Enable proxy fallback")
+            .setDesc("When a proxy is unavailable, automatically try the next matching proxy in list order")
+            .addToggle(toggle => toggle
+                .setValue(config.enableProxyFallback)
+                .onChange(async (value) => {
+                    config.enableProxyFallback = value;
+                    await this.configManager.saveConfig(config);
+                }));
+
+        new Setting(containerEl)
             .setName("Cache TTL (minutes)")
             .setDesc("How long to cache proxy health check results (1–30)")
             .addText(text => {
@@ -209,6 +219,10 @@ export class UrlTransformerSettingTab extends PluginSettingTab {
         const config = this.configManager.getConfig();
 
         containerEl.createEl("h3", { text: "Transformation Rules" });
+        containerEl.createEl("p", {
+            text: "Rules are tried in the order shown below. Drag to reorder, or use the arrow buttons.",
+            cls: "setting-item-description",
+        });
 
         const rulesContainer = containerEl.createDiv({ cls: "url-transformer-rules" });
 
@@ -220,17 +234,78 @@ export class UrlTransformerSettingTab extends PluginSettingTab {
             return;
         }
 
-        const sortedRules = [...config.rules].sort((a, b) => b.priority - a.priority);
-
-        for (const rule of sortedRules) {
-            this.displayRule(rulesContainer, rule);
+        for (let i = 0; i < config.rules.length; i++) {
+            this.displayRule(rulesContainer, config.rules[i], i, config.rules.length);
         }
     }
 
-    private displayRule(container: HTMLElement, rule: TransformationRule): void {
-        const ruleSetting = new Setting(container)
-            .setName(rule.name)
+    private displayRule(container: HTMLElement, rule: TransformationRule, index: number, total: number): void {
+        const ruleEl = container.createDiv({ cls: "url-transformer-rule-item" });
+        ruleEl.setAttribute("draggable", "true");
+        ruleEl.dataset.ruleId = rule.id;
+        ruleEl.dataset.ruleIndex = String(index);
+
+        ruleEl.addEventListener("dragstart", (e: DragEvent) => {
+            ruleEl.addClass("is-dragging");
+            e.dataTransfer?.setData("text/plain", rule.id);
+        });
+
+        ruleEl.addEventListener("dragend", () => {
+            ruleEl.removeClass("is-dragging");
+            container.querySelectorAll(".drag-over").forEach(el => el.removeClass("drag-over"));
+        });
+
+        ruleEl.addEventListener("dragover", (e: DragEvent) => {
+            e.preventDefault();
+            ruleEl.addClass("drag-over");
+        });
+
+        ruleEl.addEventListener("dragleave", () => {
+            ruleEl.removeClass("drag-over");
+        });
+
+        ruleEl.addEventListener("drop", async (e: DragEvent) => {
+            e.preventDefault();
+            ruleEl.removeClass("drag-over");
+            const draggedId = e.dataTransfer?.getData("text/plain");
+            if (!draggedId || draggedId === rule.id) {
+                return;
+            }
+
+            const config = this.configManager.getConfig();
+            const fromIndex = config.rules.findIndex(r => r.id === draggedId);
+            const toIndex = config.rules.findIndex(r => r.id === rule.id);
+            if (fromIndex === -1 || toIndex === -1) {
+                return;
+            }
+
+            const [moved] = config.rules.splice(fromIndex, 1);
+            config.rules.splice(toIndex, 0, moved);
+            await this.configManager.saveConfig(config);
+            this.display();
+        });
+
+        const ruleSetting = new Setting(ruleEl)
+            .setName(`${index + 1}. ${rule.name}`)
             .setDesc(this.getRuleDescription(rule));
+
+        if (index > 0) {
+            ruleSetting.addButton(button => button
+                .setIcon("arrow-up")
+                .setTooltip("Move up")
+                .onClick(async () => {
+                    await this.moveRule(index, index - 1);
+                }));
+        }
+
+        if (index < total - 1) {
+            ruleSetting.addButton(button => button
+                .setIcon("arrow-down")
+                .setTooltip("Move down")
+                .onClick(async () => {
+                    await this.moveRule(index, index + 1);
+                }));
+        }
 
         ruleSetting.addToggle(toggle => toggle
             .setValue(rule.enabled)
@@ -258,10 +333,21 @@ export class UrlTransformerSettingTab extends PluginSettingTab {
         }
     }
 
+    private async moveRule(fromIndex: number, toIndex: number): Promise<void> {
+        const config = this.configManager.getConfig();
+        const [moved] = config.rules.splice(fromIndex, 1);
+        config.rules.splice(toIndex, 0, moved);
+        await this.configManager.saveConfig(config);
+        this.display();
+    }
+
     private getRuleDescription(rule: TransformationRule): string {
         const matchersText = rule.matchers.join(", ");
         const typeText = rule.transformationType === "prefix" ? "Prefix" : "Path Extraction";
-        return `Type: ${typeText} | Matches: ${matchersText} | Priority: ${rule.priority}`;
+        const excludeText = rule.excludeMatchers && rule.excludeMatchers.length > 0
+            ? ` | Excludes: ${rule.excludeMatchers.join(", ")}`
+            : "";
+        return `Type: ${typeText} | Matches: ${matchersText}${excludeText} | Priority: ${rule.priority}`;
     }
 
     private displayAddRuleButton(): void {
@@ -311,6 +397,7 @@ class RuleEditorModal extends Modal {
 
     private nameInput: HTMLInputElement;
     private matchersInput: HTMLTextAreaElement;
+    private excludeMatchersInput: HTMLTextAreaElement;
     private typeSelect: HTMLSelectElement;
     private templateInput: HTMLInputElement;
     private priorityInput: HTMLInputElement;
@@ -337,13 +424,23 @@ class RuleEditorModal extends Modal {
             });
 
         new Setting(contentEl)
-            .setName("URL matchers")
+            .setName("URL matchers (include)")
             .setDesc("Domain patterns to match (one per line). Use * for wildcard, *.domain.com for subdomains")
             .addTextArea(text => {
                 this.matchersInput = text.inputEl;
                 text.setValue(this.rule?.matchers.join("\n") || "")
                     .setPlaceholder("*.medium.com\nmedium.com");
                 text.inputEl.rows = 4;
+            });
+
+        new Setting(contentEl)
+            .setName("URL matchers (exclude)")
+            .setDesc("Domain patterns to exclude (one per line). URLs matching these will NOT use this proxy.")
+            .addTextArea(text => {
+                this.excludeMatchersInput = text.inputEl;
+                text.setValue(this.rule?.excludeMatchers?.join("\n") || "")
+                    .setPlaceholder("blog.example.com\n*.internal.com");
+                text.inputEl.rows = 3;
             });
 
         new Setting(contentEl)
@@ -389,6 +486,7 @@ class RuleEditorModal extends Modal {
     private handleSave(): void {
         const name = this.nameInput.value.trim();
         const matchersText = this.matchersInput.value.trim();
+        const excludeMatchersText = this.excludeMatchersInput.value.trim();
         const template = this.templateInput.value.trim();
         const priority = parseInt(this.priorityInput.value) || 100;
 
@@ -398,6 +496,9 @@ class RuleEditorModal extends Modal {
         }
 
         const matchers = matchersText.split("\n").map(m => m.trim()).filter(m => m.length > 0);
+        const excludeMatchers = excludeMatchersText
+            ? excludeMatchersText.split("\n").map(m => m.trim()).filter(m => m.length > 0)
+            : [];
 
         if (matchers.length === 0) {
             new Notice("Please provide at least one URL matcher");
@@ -409,7 +510,8 @@ class RuleEditorModal extends Modal {
             name,
             enabled: this.rule?.enabled ?? true,
             matchers,
-            transformationType: this.typeSelect.value as any,
+            excludeMatchers,
+            transformationType: this.typeSelect.value as TransformationType,
             template,
             priority,
         };

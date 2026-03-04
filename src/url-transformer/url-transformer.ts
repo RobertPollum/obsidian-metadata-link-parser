@@ -39,18 +39,25 @@ export class UrlTransformer {
             return false;
         }
 
-        return rule.matchers.some(matcher => this.matchesPattern(url, matcher));
-    }
-
-    private findMatchingRule(url: string, rules: TransformationRule[]): TransformationRule | null {
-        const matchingRules = rules.filter(rule => this.matchesRule(url, rule));
-
-        if (matchingRules.length === 0) {
-            return null;
+        const included = rule.matchers.some(matcher => this.matchesPattern(url, matcher));
+        if (!included) {
+            return false;
         }
 
+        if (rule.excludeMatchers && rule.excludeMatchers.length > 0) {
+            const excluded = rule.excludeMatchers.some(matcher => this.matchesPattern(url, matcher));
+            if (excluded) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private findMatchingRules(url: string, rules: TransformationRule[]): TransformationRule[] {
+        const matchingRules = rules.filter(rule => this.matchesRule(url, rule));
         matchingRules.sort((a, b) => b.priority - a.priority);
-        return matchingRules[0];
+        return matchingRules;
     }
 
     private applyTransformation(url: string, rule: TransformationRule): string {
@@ -139,10 +146,10 @@ export class UrlTransformer {
         return healthy;
     }
 
-    async transformUrl(url: string, rules: TransformationRule[]): Promise<TransformationResult> {
-        const matchingRule = this.findMatchingRule(url, rules);
+    async transformUrl(url: string, rules: TransformationRule[], enableFallback = false): Promise<TransformationResult> {
+        const matchingRules = this.findMatchingRules(url, rules);
 
-        if (!matchingRule) {
+        if (matchingRules.length === 0) {
             return {
                 transformedUrl: url,
                 originalUrl: url,
@@ -150,26 +157,38 @@ export class UrlTransformer {
             };
         }
 
-        const transformedUrl = this.applyTransformation(url, matchingRule);
-        const proxyBaseUrl = this.extractProxyBaseUrl(transformedUrl);
+        const failedRules: string[] = [];
 
-        const isHealthy = await this.checkProxyHealth(proxyBaseUrl, matchingRule);
+        const rulesToTry = enableFallback ? matchingRules : [matchingRules[0]];
 
-        if (!isHealthy) {
-            return {
-                transformedUrl: null,
-                originalUrl: url,
-                appliedRule: matchingRule.name,
-                proxyHealthy: false,
-                error: `Proxy service "${matchingRule.name}" is currently unavailable`,
-            };
+        for (const rule of rulesToTry) {
+            const transformedUrl = this.applyTransformation(url, rule);
+            const proxyBaseUrl = this.extractProxyBaseUrl(transformedUrl);
+
+            const isHealthy = await this.checkProxyHealth(proxyBaseUrl, rule);
+
+            if (isHealthy) {
+                if (failedRules.length > 0) {
+                    console.log(`Proxy fallback: "${failedRules.join('", "')}" failed, using "${rule.name}"`);
+                }
+                return {
+                    transformedUrl,
+                    originalUrl: url,
+                    appliedRule: rule.name,
+                    proxyHealthy: true,
+                };
+            }
+
+            failedRules.push(rule.name);
+            console.warn(`Proxy "${rule.name}" is unhealthy for ${url}${enableFallback ? ", trying next..." : ""}`);
         }
 
         return {
-            transformedUrl,
+            transformedUrl: null,
             originalUrl: url,
-            appliedRule: matchingRule.name,
-            proxyHealthy: true,
+            appliedRule: failedRules.join(", "),
+            proxyHealthy: false,
+            error: `All matching proxy services are currently unavailable: ${failedRules.join(", ")}`,
         };
     }
 

@@ -1,0 +1,29 @@
+/* Drag-and-drop rule reordering */
+.url-transformer-rule-item {
+    cursor: grab;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 2px 4px;
+    margin-bottom: 2px;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.url-transformer-rule-item:hover {
+    background-color: var(--background-modifier-hover);
+}
+
+.url-transformer-rule-item.is-dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+}
+
+.url-transformer-rule-item.drag-over {
+    border-color: var(--interactive-accent);
+    background-color: var(--background-modifier-hover);
+}
+
+/* Watch folders container */
+.watch-folders-container .setting-item {
+    border-bottom: none;
+    padding: 4px 0;
+}

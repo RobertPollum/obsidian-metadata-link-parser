@@ -24,6 +24,7 @@ export class TransformationConfigManager {
     getDefaultConfig(): TransformationConfig {
         return {
             rules: getDefaultTransformationRules(),
+            enableProxyFallback: true,
             proxyHealthCacheTtlMinutes: 5,
             proxyHealthTimeoutMs: 5000,
             autoProcessing: this.getDefaultAutoProcessingConfig(),
@@ -61,8 +62,14 @@ export class TransformationConfigManager {
 
         const defaultAutoProcessing = this.getDefaultAutoProcessingConfig();
 
+        const migratedRules = [...loadedConfig.rules, ...newDefaultRules].map(rule => ({
+            ...rule,
+            excludeMatchers: rule.excludeMatchers ?? [],
+        }));
+
         return {
-            rules: [...loadedConfig.rules, ...newDefaultRules],
+            rules: migratedRules,
+            enableProxyFallback: loadedConfig.enableProxyFallback ?? true,
             proxyHealthCacheTtlMinutes: loadedConfig.proxyHealthCacheTtlMinutes ?? 5,
             proxyHealthTimeoutMs: loadedConfig.proxyHealthTimeoutMs ?? 5000,
             autoProcessing: {
