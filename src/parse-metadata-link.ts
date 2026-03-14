@@ -186,7 +186,6 @@ export class MetadataLinkParser {
         const result = await this.urlTransformer.transformUrl(
             url,
             this.transformationConfig.rules,
-            this.transformationConfig.enableProxyFallback,
         );
 
         return {
@@ -363,8 +362,15 @@ export class MetadataLinkParser {
                 await this.updateFrontmatterWithProxyInfo(file, originalUrl, urlToFetch, transformResult.appliedRule);
             }
 
+            // Extract and merge any frontmatter from the fetched article
+            const { frontmatter: fetchedFrontmatter, body: articleBody } = this.splitFrontmatter(articleMarkdown);
+
+            if (fetchedFrontmatter && Object.keys(fetchedFrontmatter).length > 0) {
+                await this.mergeFetchedFrontmatter(file, fetchedFrontmatter);
+            }
+
             const separator = "\n\n---\n\n## Retrieved Article Content\n\n";
-            const contentToAppend = separator + articleMarkdown;
+            const contentToAppend = separator + articleBody;
 
             await this.app.vault.append(file, contentToAppend);
 
@@ -527,8 +533,14 @@ export class MetadataLinkParser {
                     await this.updateFrontmatterWithProxyInfo(file, transformResult.originalUrl, transformResult.url, transformResult.appliedRule);
                 }
 
+                const { frontmatter: fetchedFrontmatter, body: articleBody } = this.splitFrontmatter(articleMarkdown);
+
+                if (fetchedFrontmatter && Object.keys(fetchedFrontmatter).length > 0) {
+                    await this.mergeFetchedFrontmatter(file, fetchedFrontmatter);
+                }
+
                 const separator = "\n\n---\n\n## Retrieved Article Content\n\n";
-                await this.app.vault.append(file, separator + articleMarkdown);
+                await this.app.vault.append(file, separator + articleBody);
                 await this.markFileAsProcessed(file);
 
                 console.log(`Auto-processed ${file.path}: ratio ${ratio.toFixed(2)} >= ${minContentRatio}`);
@@ -539,6 +551,83 @@ export class MetadataLinkParser {
         } catch (error) {
             console.error(`Error auto-processing ${file.path}:`, error);
             return false;
+        }
+    }
+
+    /**
+     * Split a markdown string into frontmatter object and body content.
+     * If no frontmatter delimiters are found, returns null frontmatter and the full string as body.
+     */
+    private splitFrontmatter(markdown: string): { frontmatter: Record<string, unknown> | null; body: string } {
+        const trimmed = markdown.trimStart();
+        if (!trimmed.startsWith("---")) {
+            return { frontmatter: null, body: markdown };
+        }
+
+        const endIndex = trimmed.indexOf("---", 3);
+        if (endIndex === -1) {
+            return { frontmatter: null, body: markdown };
+        }
+
+        const yamlBlock = trimmed.substring(3, endIndex).trim();
+        const body = trimmed.substring(endIndex + 3).trimStart();
+
+        try {
+            const parsed = parseYaml(yamlBlock);
+            if (parsed && typeof parsed === "object") {
+                return { frontmatter: parsed as Record<string, unknown>, body };
+            }
+        } catch (error) {
+            console.warn("Failed to parse fetched article frontmatter:", error);
+        }
+
+        return { frontmatter: null, body: markdown };
+    }
+
+    /**
+     * Merge fetched article metadata into the file's existing frontmatter.
+     * Only adds keys that don't already exist in the file's frontmatter.
+     */
+    private async mergeFetchedFrontmatter(file: TFile, fetchedMeta: Record<string, unknown>): Promise<void> {
+        try {
+            const content = await this.app.vault.read(file);
+            const frontMatterInfo = getFrontMatterInfo(content);
+
+            if (!frontMatterInfo.exists) {
+                // Create new frontmatter from fetched metadata
+                const yamlLines = Object.entries(fetchedMeta)
+                    .map(([key, value]) => this.serializeYamlValue(key, value));
+                const newFrontmatter = `---\n${yamlLines.join("\n")}\n---\n\n`;
+                const newContent = newFrontmatter + content;
+                await this.app.vault.modify(file, newContent);
+            } else {
+                const frontmatterText = content.substring(
+                    frontMatterInfo.from,
+                    frontMatterInfo.to,
+                );
+                const existingFrontmatter = parseYaml(frontmatterText) || {};
+
+                // Merge: only add keys from fetched that aren't already present
+                let updated = false;
+                const mergedFrontmatter = { ...existingFrontmatter };
+                for (const [key, value] of Object.entries(fetchedMeta)) {
+                    if (!(key in mergedFrontmatter) && value !== null && value !== undefined) {
+                        mergedFrontmatter[key] = value;
+                        updated = true;
+                    }
+                }
+
+                if (updated) {
+                    const yamlLines = Object.entries(mergedFrontmatter)
+                        .map(([key, value]) => this.serializeYamlValue(key, value));
+                    const newFrontmatter = `---\n${yamlLines.join("\n")}\n---\n`;
+                    const afterFrontmatter = content.substring(frontMatterInfo.contentStart ?? frontMatterInfo.to);
+                    const newContent = newFrontmatter + afterFrontmatter;
+                    await this.app.vault.modify(file, newContent);
+                }
+            }
+        } catch (error) {
+            console.error("Error merging fetched frontmatter:", error);
         }
     }
 

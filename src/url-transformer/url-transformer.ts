@@ -55,9 +55,7 @@ export class UrlTransformer {
     }
 
     private findMatchingRules(url: string, rules: TransformationRule[]): TransformationRule[] {
-        const matchingRules = rules.filter(rule => this.matchesRule(url, rule));
-        matchingRules.sort((a, b) => b.priority - a.priority);
-        return matchingRules;
+        return rules.filter(rule => this.matchesRule(url, rule));
     }
 
     private applyTransformation(url: string, rule: TransformationRule): string {
@@ -146,7 +144,35 @@ export class UrlTransformer {
         return healthy;
     }
 
-    async transformUrl(url: string, rules: TransformationRule[], enableFallback = false): Promise<TransformationResult> {
+    async transformUrl(url: string, rules: TransformationRule[]): Promise<TransformationResult> {
+        const matchingRules = this.findMatchingRules(url, rules);
+
+        if (matchingRules.length === 0) {
+            return {
+                transformedUrl: url,
+                originalUrl: url,
+                proxyHealthy: true,
+            };
+        }
+
+        // Use the first matching rule directly (rules are in user-defined list order)
+        const firstRule = matchingRules[0];
+        const transformedUrl = this.applyTransformation(url, firstRule);
+
+        return {
+            transformedUrl,
+            originalUrl: url,
+            appliedRule: firstRule.name,
+            proxyHealthy: true,
+        };
+    }
+
+    /**
+     * Transform URL with health-check validation.
+     * Tries each matching rule in list order; skips unhealthy proxies.
+     * Falls back to next matching rule when enableFallback is true.
+     */
+    async transformUrlWithHealthCheck(url: string, rules: TransformationRule[], enableFallback = false): Promise<TransformationResult> {
         const matchingRules = this.findMatchingRules(url, rules);
 
         if (matchingRules.length === 0) {
@@ -158,7 +184,6 @@ export class UrlTransformer {
         }
 
         const failedRules: string[] = [];
-
         const rulesToTry = enableFallback ? matchingRules : [matchingRules[0]];
 
         for (const rule of rulesToTry) {
