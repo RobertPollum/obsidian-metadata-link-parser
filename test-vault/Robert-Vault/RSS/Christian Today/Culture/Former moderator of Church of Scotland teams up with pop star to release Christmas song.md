@@ -1,0 +1,13 @@
+---
+title: Former moderator of Church of Scotland teams up with pop star to release Christmas song
+link: https://www.christiantoday.com/news/former-moderator-of-church-of-scotland-teams-up-with-pop-star-to-release-christmas-song
+author: Staff writer
+publish_date: 2025-12-19 00:37:00
+saved_date: 2026-01-17 15:09:13
+image: https://www.christiantoday.com/media/original/img/9/84/98432.png
+tags: 
+---
+
+![image](https://www.christiantoday.com/media/original/img/9/84/98432.png)
+
+A former church leader has teamed up with a rock guitarist to release a Christmas song. The Very Rev Albert Bogle served as moderator of the Church of Scotland from 2012 to 2013. Together with his musical partner, Iain Jamieson, and Graeme Duffin of Wet Wet Wet fame, he has produced the song “Room at the Table”. The aim of the song is to remind people of the true meaning of Christmas and to promote compassion and tolerance. Bogle said, “We wanted to create a Christmas song that acknowledges the challenges people face but ultimately offers a beacon of hope and inclusion. The message is simple - there is always ‘room at the table’ and sometimes, we just have to make it.” Songwriting is just another medium to express one’s faith, and an effective way of sharing the Christmas story, Bogle argues. “Nobody listens to a sermon over and over again, but they will with a song," he said. "I have been writing and recording Christmas songs for quite a while now. Last year’s Christmas single was almost a protest carol against everything that was happening in Gaza and elsewhere and called ‘Angels over Bethlehem.’ “There was a sadness in that one, almost asking God if He could send some angels to bring peace and make them all think again. "This year, I was thinking about the increase in populism and the change in public attitude towards people who are homeless or refugees and asylum seekers and the politicians who are promoting the idea that there is only one pie and there is not enough for everyone." While Duffin may be better known for his work as the guitarist for Wet Wet Wet, he has actually been associated with Bogle and Jamieson for 20 years and has been a committed Christian for most of his life. Wet Wet Wet's biggest hit was "Love is All Around", a cover of the song by The Troggs. It became an international hit after appearing on the soundtrack to the 1994 movie Four Weddings and a Funeral, and spent 15 weeks at number one in the UK. "Room At The Table" can be viewed here.

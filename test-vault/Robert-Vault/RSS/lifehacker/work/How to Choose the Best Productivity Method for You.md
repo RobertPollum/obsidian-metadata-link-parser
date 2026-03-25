@@ -1,0 +1,61 @@
+---
+title: How to Choose the Best Productivity Method for You
+link: https://lifehacker.com/work/how-to-choose-the-right-productivity-method?utm_medium=RSS
+author: Lindsey Ellefson
+publish_date: 2025-11-19 08:30:00
+saved_date: 2026-01-17 15:08:48
+image: https://lifehacker.com/imagery/articles/01J2W0PEHYYFDEA1RB5V8YE60T/hero-image.png
+tags: #Work
+---
+
+![image](https://lifehacker.com/imagery/articles/01J2W0PEHYYFDEA1RB5V8YE60T/hero-image.png)
+
+I've been [reading](https://lifehacker.com/work/best-productivity-advice-from-books) and [writing](https://lifehacker.com/best-productivity-methods-1850862925) about productivity techniques for years now, and I continue to be shocked by the sheer variety and quantity on offer. There are _so_ many (some admittedly more "duh" than others), and while many could easily slot right into my workflow, others led me to think, "Wow, that one wouldn't work for me at _all_."
+
+Obviously I don't personally use all of the methods I've written about, but it's not because I don't believe in them. The fact is that no technique will work for every person, and no one person is going to be suited to every technique. The trick is to figure out which one(s) might work for you.  
+  
+It's easy to learn about a technique, be persuaded to see its value, and decide to implement it, but if it's not altogether aligned with your needs, it's probably not going to work for you as advertised. Instead of picking a productivity method that _sounds_ good, you're better off selecting one that is better suited to you and how you work. Here's what to look for.
+
+## The best productivity method if you're a visual thinker...
+
+If you need to visualize something to really understand it—like if you prefer to see graphs instead of reading about statistics or numbers—there are some solid productivity techniques out there for you. The best is probably the ["pickle jar" technique](https://lifehacker.com/work/pickle-jar-theory-to-prioritize-tasks), which asks you to imagine your daily capacity as a jar that can hold a finite amount of rocks, pebbles, and sand.
+
+The rocks are your big tasks, pebbles are important tasks that aren't immediately necessary, and sand is the little maintenance work you do to keep your day moving along. You load in your rocks first, then your pebbles, and finally the sand, to make sure you have enough time for it all. You can draw out a little diagram to help you prioritize your to-do list this way.
+
+Essentially, the pickle jar is a simple, more visual way to work through the [1-3-5 approach](https://lifehacker.com/work/make-a-better-to-do-list-1-3-5-rule), which acknowledges the fact that you can't do everything, so you have to be selective about what you _do_ attempt. With 1-3-5, you do one major task, three medium-sized ones, and five smaller ones each day.
+
+Whether you're imagining a jar full of debris or more methodically writing out the 1-3-5 list, you might need assistance determining what a "rock"-sized task is, or what five small tasks are. That's where prioritization techniques come in—and the best one, in my opinion, is also suited to visual thinkers. Called the [Eisenhower matrix](https://lifehacker.com/use-the-eisenhower-matrix-to-prioritize-your-to-do-list), this prioritization approach helps you streamline your to-dos by creating a chart that demonstrates which of your tasks are urgent, important, not urgent, and not important. Give it a try if you're having a hard time constructing the pickle jar.
+
+## The best productivity method if you need motivation to get started...
+
+With some productivity methods, you're meant to just figure out what you need to do, then get cracking on it. That doesn't work for everyone. It certainly doesn't work for me—I need to get a burst of motivation or a spark of energy to keep grinding on a to-do list. The best options for people like me, in my opinion, are [eating the frog](https://lifehacker.com/eat-the-frog-first-thing-in-the-morning-1850396305) or [the two-minute rule](https://lifehacker.com/how-to-use-the-two-minute-rule-to-stop-procrastinating).
+
+"Eating the frog" is a weird saying, but it boils down to tackling your most demanding, dreaded, or important task before you do anything else. The two-minute rule is similar, but when you try to follow that one, you commit to doing anything that takes less than two minutes the moment it pops into your head. I stick to a combination of the two, endeavoring to accomplish my biggest to-do early in the day, but allowing myself to start any task the moment motivation strikes, provided it's doable in a shorter time frame.
+
+In my experience, eating the frog works well for me because once I have the most pressing thing out of the way, I'm so relieved and proud of myself that anything else I have to do seems easy in comparison. If I can do the terrible thing, I can do _anything_.  
+  
+On the other hand, the opposite approach can have a similar result, so try [the 10-minute rule](https://lifehacker.com/work/instead-of-eating-the-frog-try-the-10-minute-rule-to-be-productive) if eating the frog feels daunting but you still need a little motivational push. With this method, you blow through all those little tasks that take 10 minutes or less to do, like answering emails or folding the laundry, so you can concentrate on the bigger stuff. As minor as they are, the little things can feel overwhelming, and they're easy to put off. If you get them all done with so they're not weighing on you, you'll feel better and more prepared to do everything else. There's a slight difference between the two- and 10-minute rules, so play around with all of these to see what works for you.
+
+## The best productivity method if you don't feel connected to your work...
+
+The tasks of daily life can be menial and if you're not the kind of person who just buckles down and does what needs to be done, that can be a good reason to put it all off. If you can't justify spending an afternoon cleaning up or a morning responding to emails, you might be motivated by purpose, so try the [Results Planning Method (RPM)](https://lifehacker.com/work/use-the-rapid-planning-method-to-structure-your-day), which comes from famed motivational speaker Tony Robbins, who outlined it in his [_Time of Your Life_](https://www.tonyrobbins.com/pdfs/Workbook-Time-of-your-Life.pdf "open in a new window") program and designed it to be motivational, fast, and efficient.  
+  
+Not only does does the acronym stand for Rapid Planning Method, but it can also serve as a guide to what your day should look like: **R**esults-oriented, **p**urpose-driven, and built around a "**m**assive action plan." You have to consistently ask yourself what you want, what your purpose is, and what you need to do to achieve it. So maybe you won't clean up just because it's that time of the week to do it, but you'll be more motivated to do it if you think of a broader purpose, like having the house in shape so you can have friends over for dinner. Doing something for the sake of it just doesn't motivate everyone and that's fine.
+
+Another way you can feel connected to your tasks is by putting some extra thought into them. The [Ivy Lee method](https://lifehacker.com/work/the-ivy-lee-productivity-method) calls on you to write down six tasks you have to do the next day. You should do this at the end of every work day (or at the end of the night, if the tasks are home-related). By writing them down, you get them out of your mind and know you'll get to them the next day, so you can relax in the knowledge that you already have half a plan ready to go when you wake up.
+
+When I don't feel connected to my own work, I write out a [SMART goal](https://lifehacker.com/use-this-smart-goals-formula-to-be-more-productive-1850736205). That means I take the time to write out a plan that is **s**pecific, **m**easurable, **a**ctionable, **r**elevant, and **t**ime-bound. By doing this, I force myself to think long-term about the biggest picture goals I have, then work backward to determine what small steps I need to take to make those a reality within the time frame I've outlined. This works for me because as I start working on those steps, I keep the bigger goal in mind; that keeps me focused and connected to what I'm doing, even if it feels menial in the moment.
+
+## The best productivity method if you need a detailed plan...
+
+When you're eating the frog or jotting down a few to-dos, you just kind of wing it, designating your "big task" and going for it. But sometimes, it's nice to have a detailed schedule in place. Here, I recommend the [3-3-3 method](https://lifehacker.com/get-more-done-with-the-3-3-3-method-1850729849), but first, you'll need to whip out the old [Eisenhower matrix](https://lifehacker.com/prioritize-your-tasks-with-the-eisenhower-matrix-1850718007) I mentioned before.
+
+Once you have everything categorized, you can move over to 3-3-3, which asks you to spend the first three hours of your day [engaging in deep work](https://lifehacker.com/deep-work-productivity-method) on your most important project, then do three other urgent tasks that don't require as much time, and finish up with three maintenance tasks. It's a combination of eating the frog and visualizing the pickle jar, but it incorporates pretty strict scheduling to keep you on task.
+
+Let's talk about deep work for a second. Deep work is what happens when you're in a flow state, focusing solely on one task with no distractions. You'll know you've achieved it when time feels like it flies by. If you struggle to sink into it, there's a technique for you. Actually, there are a few, but they're all based on the same idea. Try the [Pomodoro method](https://lifehacker.com/how-to-use-the-pomodoro-method-for-studying), which has you work for 25 minutes, take a five-minute break, then repeat that cycle until you've completed four rounds. After that, you get a bigger break. Ideally, use an app designed to time your work sessions and block your other, more distracting apps. ([FocusPomo](https://lifehacker.com/tech/focuspomo-app-review) is my favorite.) If this isn't working for you, don't give up. You can and should [modify your Pomodoro times](https://lifehacker.com/work/modify-the-pomodoro-technique) to meet your own needs if you have to. There are already Pomodoro spin-offs out there, like [Pomodoro 2.0](https://lifehacker.com/work/try-pomodoro-20-to-focus-on-deep-work) and [animedoro](https://lifehacker.com/work/how-to-use-animedoro-productivity-method), but feel free to fiddle around until you invent your own.
+
+## The best productivity method if you're being pulled in too many directions...
+
+Your life is complex. You're not just an employee, but potentially a parent, a spouse, a friend, a volunteer, a freelance or recreational something-or-other—and that's to say nothing of what you are to yourself, whether that's someone who prioritizes the gym or someone who can't focus when the house is a mess. If you're following a traditional productivity technique throughout the day, it can be hard to determine the tasks from each area of your life that should be taken care of. Certainly, a work responsibility, family matter, or personal obligation is bound to fall through the cracks in favor of something else.
+
+If that's holding you up, consider [theming your days](https://lifehacker.com/theme-every-work-day-for-a-more-productive-week-1850693620). Mondays might be for all your maintenance tasks at work, like answering emails or having meetings. Tuesdays might be the day you set aside for cleaning your home or meal prepping. Wednesdays might be the day you work on tasks for a board you sit on or a part-time job. Within that structure, you can call on one of the techniques above, like 1-3-5, knowing that the majority of your to-dos that day will all be related to whatever the theme is. This keeps you focused and in the zone, whatever the zone is, each day, but also allows you to devote necessary time to each of the arenas in which you're involved. No, it's not perfect. Something from an off-theme day will come up eventually and need to be addressed. But the goal here isn't to be strict about it. Rather, it's to give yourself a general sense of direction throughout the week.

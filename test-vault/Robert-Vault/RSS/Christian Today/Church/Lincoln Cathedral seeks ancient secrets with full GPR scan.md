@@ -1,0 +1,13 @@
+---
+title: Lincoln Cathedral seeks ancient secrets with full GPR scan
+link: https://www.christiantoday.com/news/lincoln-cathedral-seeks-ancient-secrets-with-full-gpr-scan
+author: Staff writer
+publish_date: 2026-01-09 00:41:00
+saved_date: 2026-01-17 15:09:12
+image: https://www.christiantoday.com/media/original/img/9/78/97837.jpg
+tags: 
+---
+
+![image](https://www.christiantoday.com/media/original/img/9/78/97837.jpg)
+
+Lincoln Cathedral has become part of a pioneering project to use ground-penetrating radar (GPR) to uncover the secret history of the site. While GPR has been used to explore sections of some of Britain’s cathedrals, Lincoln Cathedral is the first to undergo a complete GPR survey. The process took around two weeks to complete, with archaeologists using electromagnetic waves to map the ground beneath the cathedral. Work was done early in the morning in order to avoid visitors. Originally cathedral authorities commissioned the survey, not for historical purposes, but to check for voids beneath the paving and confirm the positioning of central heating pipes and other infrastructure. A GPR survey was deemed a more cost effective and less disruptive method than excavation. Dr Jonathan Clark, the cathedral's archaeologist, told the BBC, "We've got the better part of 2,000 years of history here that we're unpeeling … we're finding out a lot more about the early history of the cathedral." "It's like slicing through a cake. You're seeing lots of different layers and lots of different periods.” It is not yet known what, if anything, will be uncovered by the GPR survey, the results of which are due in the spring. Dr Clark said, "There are some very significant people buried in the cathedral and I suspect that there are quite a few people that we don't know about yet, which could lead to some interesting surprises. "I'm optimistic we might find some quite unexpected individuals here as well." The current iteration of Lincoln Cathedral is different to that constructed by the Normans in the late 11th century. In 1185 an earthquake devastated the building. Only the west front of the cathedral was spared destruction. It survives to this day. Rebuilding work began and for a time the cathedral was the tallest building in the world, until the collapse of its spire in 1549. Last year archivists at Lincoln Cathedral unexpectedly discovered never-before-seen correspondence by the author of Alice in Wonderland, Lewis Carroll. A letter containing an invitation to a dinner party mentioned a number of people who partially inspired scenes from Carroll’s most famous work, Alice in Wonderland.

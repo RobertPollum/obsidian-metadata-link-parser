@@ -1,0 +1,23 @@
+---
+title: Use the 'MIT Method' to Keep Your Big-Picture Goals in Mind During Everyday Tasks
+link: https://lifehacker.com/work/how-to-use-the-mit-productivity-method?utm_medium=RSS
+author: Lindsey Ellefson
+publish_date: 2025-12-08 08:30:00
+saved_date: 2026-01-17 15:08:48
+image: https://lifehacker.com/imagery/articles/01J336QQAET3RS8QW5PARXXZ4J/hero-image.png
+tags: #Work
+---
+
+![image](https://lifehacker.com/imagery/articles/01J336QQAET3RS8QW5PARXXZ4J/hero-image.png)
+
+So many productivity methods ask you to [prioritize your daily tasks](https://lifehacker.com/use-the-eisenhower-matrix-to-prioritize-your-to-do-list) by [considering how much time or effort](https://lifehacker.com/track-your-work-with-the-kanban-method-1850721028) they'll require, then tackling the resource-heavy ones first. [For some people](https://lifehacker.com/work/how-to-choose-the-right-productivity-method), that's a solid strategy, since you can definitely get some motivation from getting your toughest, most demanding responsibilities out of the way. There's even a weird name for doing that: "[Eating the frog](https://lifehacker.com/eat-the-frog-method)." But you can also find motivation in working toward a bigger goal, so what if you prioritized your tasks based on importance and impact, no matter how big or small they are?
+
+That's what the [Most Important Task (MIT) method](https://personalmba.com/most-important-tasks "open in a new window") involves: rather than thinking of specific tasks and how long they'll take, the MIT method asks you to look more broadly at the overall goal you're trying to accomplish. Reframing your approach to productivity by focusing on your goal instead can motivate you to get more done and achieve better results.
+
+## How to use the MIT method
+
+First, you'll need to nail down your goals. You can set [SMART goals](https://lifehacker.com/use-smart-goals-to-study-more-effectively-1850892313) or combine the MIT method with the [Results Planning Method (RPM)](https://lifehacker.com/work/use-the-rapid-planning-method-to-structure-your-day), which asks you to consider your purpose when planning your day. Take some time to write down your goals—the big ones, the ones that all your daily tasks are ostensibly supposed to move you toward. Think of weekly goals, monthly goals, and annual goals, as well as ongoing, long-term ones. Write these down or just keep them in mind, but always think about the broader, bigger picture. An easy example is school: You're not just studying so you can pass the test, but because your overall goal is to graduate, to do so with a solid GPA, and to get a quality job offer. Taking time to reaffirm that broader goal reframes how you view studying for one boring old test.
+
+Every morning, make a list of two or three Most Important Tasks for the day. These are critical tasks that will have an impact on your goals, but they don't have to be huge or resource-draining. If answering emails from a potential client will move you toward a monthly sales goal, that is more of an MIT goal than building a presentation for your boss, even though creating the presentation _seems_ like the more demanding, large-scale project. Consider the results of your tasks and prioritize those that have fast or meaningful ones. You want to focus on the two or three tasks that will actually make a difference in moving you toward your goal.
+
+Take care of those two or three tasks first, then handle other, less important tasks from your to-do list for the rest of the day. You can use a scheduling technique like the [1-3-5 list](https://lifehacker.com/work/make-a-better-to-do-list-1-3-5-rule) or [the pickle jar method](https://lifehacker.com/work/pickle-jar-theory-to-prioritize-tasks) to figure out which those are and how much time and energy you'll have for them. When using the MIT technique, you should also [use a productivity journal](https://lifehacker.com/work/you-need-a-productivity-journal) to write down your daily to-dos in the morning and reflections on how it all went at night. If you're not familiar, learn how to [conduct an after-action review](https://lifehacker.com/work/conduct-personal-after-action-review-to-improve-productivity) so you have some structure to follow while reflecting and you can efficiently build on whatever takeaways you find. That nighttime reflection is key: You need to be able to identify and see how taking on those critical tasks impacts your progress toward your goal, plus what you did well and what you could do better as you keep striving. That will keep you motivated and moving forward.

@@ -1,0 +1,13 @@
+---
+title: Churches join in day of prayer for Crans-Montana victims
+link: https://www.christiantoday.com/news/churches-join-in-day-of-prayer-for-crans-montana-victims
+author: Staff writer
+publish_date: 2026-01-09 00:42:00
+saved_date: 2026-01-17 15:09:11
+image: https://www.christiantoday.com/media/original/img/9/84/98474.png
+tags: 
+---
+
+![image](https://www.christiantoday.com/media/original/img/9/84/98474.png)
+
+Protestant churches in Switzerland have announced a day of prayer and mourning for the 40 people killed in a fire at a New Years Eve party at the Le Constellation bar in the Crans-Montana ski-resort. The fire is believed to have been started by a sparkler coming into contact with sound insulation foam, according to a preliminary investigation. Questions have been asked about capacity at the time of the disaster and why local authorities had not conducted a supposedly annual fire inspection at the bar since 2019. As well as those killed, 116 people were injured in the tragedy - the deadliest incident to occur on Swiss soil since 1990, when Alitalia Flight 404 crashed near Zurich, killing all 46 people on board. Ahead of the day of prayer on 9 January, the Evangelical Church of Switzerland (EKS) said that it wished to show “solidarity” with those impacted by the incident.  “We will not leave one another alone – neither the bereaved nor the injured, neither the emergency services nor all those who are now providing pastoral care, listening, praying, organizing, and carrying," it said.  The Church also gave thanks for support from the international Christian community, noting a letter of condolence from the World Council of Churches that quoted Psalm 34: "The Lord is near to the brokenhearted and saves the crushed in spirit." Messages of support and prayer also came in from the Evangelical Church in the Rhineland and the World Communion of Reformed Churches in Europe. A memorial service is set to take place in Crans-Montana on 9 January. On the same day the EKS said it would be ringing church bells across the country and organising prayers. “Our thoughts and prayers are with the families and friends of the deceased, with the injured, and with all those now struggling to recover," it said. It continued, "May we as churches in Switzerland and beyond continue to stand together – in prayer, in pastoral care, in concrete support. And may we discover traces of hope in this darkness: in the love that sustains, and in God, who is close to the broken.”

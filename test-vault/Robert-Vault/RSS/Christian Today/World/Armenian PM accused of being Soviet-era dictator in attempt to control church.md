@@ -1,0 +1,13 @@
+---
+title: Armenian PM accused of being Soviet-era dictator in attempt to control church
+link: https://www.christiantoday.com/news/armenian-pm-accused-of-being-soviet-era-dictator-in-attempt-to-control-church
+author: Staff writer
+publish_date: 2026-01-14 01:09:00
+saved_date: 2026-01-17 15:09:11
+image: https://www.christiantoday.com/media/original/img/9/79/97907.jpg
+tags: 
+---
+
+![image](https://www.christiantoday.com/media/original/img/9/79/97907.jpg)
+
+The conflict between church and state in Armenia has taken a dramatic turn, with Armenian Prime Minister Nikol Pashinyan, declaring that the Armenian Holy Apostolic Church will effectively be taken over by the state. Relations between Pashinyan’s government and the Church have been strained since Pashinyan came to power following the “Velvet Revolution” in 2018. Relations declined still further after Armenia’s defeat in the 2020 Nagorno-Karabakh war and subsequent territorial concessions to Azerbaijan in 2023–2024. The leader of the Church, Catholicos Karekin II, criticised the government’s foreign policy failures and apparently gave support to opposition protesters. The government in turn has cracked down on what it perceives to be dissent, with around half of the Church’s bishops reported to have been arrested. One of them, Archbishop Mikael Ajapahyan, was sentenced to two years in jail in September for supposedly encouraging the overthrow of the government by undemocratic means. Armenian prosecutors justified his imprisonment by pointing to a number of statements made by the archbishop appearing to call for a coup. In one instance, he told News.am, “I called for a coup to save the country from this madman, they are not saving it, they are also guilty of all this. This is not just a call, it must be done.” Pashinyan has said that he is attempting to save the Church from “anti-Christian” and “anti-state” groups within the Church. Following his latest announcement to effectively nationalise the Church, he said the denomination would become a “real, pure, and state-centred Church”.  Supporters of the Church have accused Pashinyan of acting like a Soviet-era dictator. Robert Amsterdam, legal counsel for Samvel Karapetyan, a billionaire philanthropist who supports the Church and is currently under house arrest, said, “He \[Pashinyan\] is nakedly admitting that he is commandeering the Church as their representatives do not blindly back his government. This is the action of a freedom hating dictator.” He continued, “This move should be condemned by all Western governments. In one fell swoop, Pashinyan is publicly saying he is ending religious freedom, freedom of speech and all pretence of maintaining Armenia’s position as a democratic state.”

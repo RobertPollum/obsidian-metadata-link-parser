@@ -1,0 +1,29 @@
+---
+title: How to Use Mindfulness to Get More Done at Work
+link: https://lifehacker.com/work/how-to-use-mindfulness-to-get-more-done-at-work?utm_medium=RSS
+author: Lindsey Ellefson
+publish_date: 2024-04-01 19:00:00
+saved_date: 2026-01-17 15:08:50
+image: https://lifehacker.com/imagery/articles/01HTDGQ46BX6RRJ0F9WFH87DR2/hero-image.png
+tags: #Work
+---
+
+![image](https://lifehacker.com/imagery/articles/01HTDGQ46BX6RRJ0F9WFH87DR2/hero-image.png)
+
+Getting yourself to do [deep work](https://lifehacker.com/use-deep-work-to-be-more-productive-1850632295)—or work that is solely focused on a single task with no disruptions or distractions—is a major part of being productive, but you might find that settling into that [flow state](https://lifehacker.com/work/how-to-use-the-flow-state) is surprisingly hard. For some, it comes easily, but if you’re not one of them, consider using some mindfulness practices to get into the zone. Mindfulness is kind of a buzzword these days, but there’s some solid research out there that shows how it can be really beneficial when you’re working. The trick is knowing how to do it and being able to tap into it, even in the office.
+
+## The link between mindfulness and focus
+
+We have enough research out there to confidently say that [mindfulness meditation improves attention and focus](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6088366/ "open in a new window"), whether [you’re a kid](https://www.researchgate.net/publication/26522728_The_evolution_of_the_importance_of_multi-sensory_teaching_techniques_in_elementary_mathematics_theory_and_practice "open in a new window") studying in school or [an adult working](https://www.frontiersin.org/articles/10.3389/fnhum.2012.00018/full "open in a new window") in the real world. The idea of mindfulness itself can be a little woo-woo, all “zen” and “inner peace.” I’m not a very woo-woo person, myself; I’m much more interested in objectivity, facts, and evidence. The good news is that psychology and psychiatry have shown that mindfulness—really just the ability to be present in a given moment and focus on what you need to focus on—is more than just breathing and being spiritual. It’s something concrete and real that has helpful applications for the treatment of depression, stress, and anxiety, plus it can be really helpful when you’re overwhelmed and need to lock in. 
+
+This works, [according to the American Psychological Association](https://www.apa.org/topics/mindfulness/meditation "open in a new window"), because focusing on your own thoughts and feelings for a few minutes can dial down your body’s response to stress. The [Yerkes-Dodson law](https://lifehacker.com/biorhythms-arent-real-but-peaks-of-productivity-can-be-1850450346) is a psychological model that suggests you need a little stress to perform well, but not _too_ much, so knowing how to self-regulate is the key to staying in that sweet spot and not letting your tension get the best of you.
+
+## How to do mindfulness practice at work
+
+You’ll notice that a lot of the research focuses on “mindfulness meditation,” which is a mental training practice that calls on you to do deep breathing and be aware of your body and thoughts. That all sounds complicated and not really like something you could do at the office, but [like progressive muscle relaxation](https://lifehacker.com/work/use-progressive-muscle-relaxation-to-destress-at-work), another de-stressing technique that can improve productivity, it can be adapted and done anywhere without drawing too much attention to you. You don’t need candles or singing bowls. You just need adaptable techniques you can pull out when you need them. 
+
+[According to Mayo Clinic](https://www.mayoclinic.org/healthy-lifestyle/consumer-health/in-depth/mindfulness-exercises/art-20046356 "open in a new window"), you can practice mindfulness just by paying attention to the world around you for a moment, which is a lot easier to pull off at work than closing your eyes and doing breathing exercises for five minutes. If you’re having a hard time focusing, try eating a favorite snack and focusing intently on the way it smells, tastes, and makes you feel. Or try looking out the window, paying attention to each sight individually while you take some deep breaths. Look at a bird, the people on the sidewalk, the clouds, whatever—and consider each one individually, taking note of how the moment of observation makes you feel. Getting out of your head, thinking of something other than work, and grounding yourself can make you more productive when you get back at it. 
+
+If it’s possible, you _can_ do some breathing exercises and real meditation, too. Try to find a comfortable, secluded spot, like an empty conference or break room, or even your desk. For a minute or two, close your eyes, take a deep breath, and focus on your breaths as they move in and out of your body. Think about only that: The breath in and the breath out. Relax your muscles bit by bit and start over if any negative or stress-related thoughts creep in. 
+
+To really tap into mindfulness, you can also try online meditation apps or guides, provided you have the time and space to do it. It might be better to try these at home and get the hang of going full zen when you need to, so you can more easily access the skill when you’re at work. The good news is that [online apps and guides have been researched](https://www.sciencedirect.com/science/article/pii/S0272735815300623 "open in a new window"), too, and shown to have “robust” effects on depression, stress, and overall mindfulness. Try [the Smiling Mind](https://www.smilingmind.com.au/ "open in a new window"), which is totally free, is aimed only at mindfulness (unlike other breathing and meditation apps, which have a variety of focuses), and has been [highly recommended by the New York Times](https://www.nytimes.com/wirecutter/reviews/best-meditation-apps/ "open in a new window").
