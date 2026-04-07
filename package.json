@@ -19,8 +19,8 @@
     "metadata",
     "url-parser"
   ],
-  "author": "",
-  "license": "MIT",
+  "author": "Robert Pollum",
+  "license": "Apache-2.0",
   "devDependencies": {
     "@types/node": "^22.0.0",
     "@typescript-eslint/eslint-plugin": "5.29.0",
