@@ -2,6 +2,12 @@
 
 An Obsidian plugin that extracts URLs from markdown files and fetches article content, with optional ReadItLater integration.
 
+## Purpose
+
+This plugin is designed to help users automatically fetch and append article content from URLs found in their Obsidian notes. It can be particularly useful for research workflows, where users want to keep their notes up-to-date with the latest content from external sources.
+
+I built this plugin to bridge the gap between pulling in RSS using [LocalRSS](https://github.com/onikun94/obsidian-local-rss) and then processing that content with the [ReadItLater](https://github.com/DominikPieper/obsidian-ReadItLater) plugins.
+
 ## Features
 
 - Extract URLs from frontmatter (`url`, `link`, `source`) or file content
