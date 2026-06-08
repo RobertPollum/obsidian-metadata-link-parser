@@ -8,6 +8,8 @@ This plugin is designed to help users automatically fetch and append article con
 
 I built this plugin to bridge the gap between pulling in RSS using [LocalRSS](https://github.com/onikun94/obsidian-local-rss) and then processing that content with the [ReadItLater](https://github.com/DominikPieper/obsidian-ReadItLater) plugins.
 
+This was solely to fill my needs so that I could keep articles from people I subscribe to in my Obsidian vault without having to manually copy and paste them or use the ReadItLater plugin for every single article.
+
 ## Features
 
 - Extract URLs from frontmatter (`url`, `link`, `source`) or file content
