@@ -24,8 +24,8 @@ I built this plugin to bridge the gap between pulling in RSS using [LocalRSS](ht
 ### From Source
 
 ```bash
-git clone https://github.com/RobertPollum/obsidian-RssItLater.git
-cd obsidian-RssItLater
+git clone https://github.com/RobertPollum/obsidian-metadata-link-parser.git
+cd obsidian-metadata-link-parser
 npm install
 npm run build
 ```
