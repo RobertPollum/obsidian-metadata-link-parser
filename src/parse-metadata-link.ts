@@ -26,6 +26,13 @@ export class MetadataLinkParser {
         );
     }
 
+    private async delayIfNeeded(): Promise<void> {
+        const delayMs = this.transformationConfig?.autoProcessing?.requestDelayMs ?? 0;
+        if (delayMs > 0) {
+            await new Promise(resolve => setTimeout(resolve, delayMs));
+        }
+    }
+
     /**
      * Serialize a value to YAML format
      * Handles arrays, strings with special characters, and other types
@@ -402,8 +409,12 @@ export class MetadataLinkParser {
 
         new Notice(`Processing ${files.length} files...`);
 
-        for (const file of files) {
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
             await this.processFile(file);
+            if (i < files.length - 1) {
+                await this.delayIfNeeded();
+            }
         }
 
         new Notice(`Completed processing ${files.length} files`);
@@ -459,7 +470,8 @@ export class MetadataLinkParser {
         let processedCount = 0;
         let skippedCount = 0;
 
-        for (const file of files) {
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
             const wasProcessed = await this.isFileProcessed(file);
             if (wasProcessed) {
                 skippedCount++;
@@ -476,6 +488,10 @@ export class MetadataLinkParser {
                 processedCount++;
             } else {
                 skippedCount++;
+            }
+
+            if (i < files.length - 1) {
+                await this.delayIfNeeded();
             }
         }
 
@@ -642,12 +658,17 @@ export class MetadataLinkParser {
         let processed = 0;
         let skipped = 0;
 
-        for (const file of files) {
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
             const wasProcessed = await this.autoProcessFileIfLonger(file, minContentRatio);
             if (wasProcessed) {
                 processed++;
             } else {
                 skipped++;
+            }
+
+            if (i < files.length - 1) {
+                await this.delayIfNeeded();
             }
         }
 
@@ -677,7 +698,8 @@ export class MetadataLinkParser {
             const skippedUrls: string[] = [];
             const downProxies = new Set<string>();
 
-            for (const url of urls) {
+            for (let i = 0; i < urls.length; i++) {
+                const url = urls[i];
                 const transformResult = await this.transformUrlIfNeeded(url);
 
                 if (!transformResult.url) {
@@ -690,6 +712,10 @@ export class MetadataLinkParser {
                 }
 
                 transformedUrls.push(transformResult.url);
+
+                if (i < urls.length - 1) {
+                    await this.delayIfNeeded();
+                }
             }
 
             if (transformedUrls.length === 0) {

@@ -24,6 +24,7 @@ export interface AutoProcessingConfig {
     folderPaths: string[];
     frequencyMinutes: number;
     minContentLengthRatio: number;
+    requestDelayMs: number;
 }
 
 export interface TransformationConfig {

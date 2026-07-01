@@ -91,6 +91,25 @@ export class UrlTransformerSettingTab extends PluginSettingTab {
                         }
                     });
             });
+
+        new Setting(containerEl)
+            .setName("Request delay (ms)")
+            .setDesc("Delay between requests during batch/folder processing (0–10000 ms, 0 = no delay)")
+            .addText(text => {
+                text.inputEl.type = "number";
+                text.inputEl.min = "0";
+                text.inputEl.max = "10000";
+                text.inputEl.step = "100";
+                text.inputEl.style.width = "80px";
+                text.setValue(String(config.autoProcessing.requestDelayMs))
+                    .onChange(async (value) => {
+                        const num = parseInt(value);
+                        if (!isNaN(num) && num >= 0 && num <= 10000) {
+                            config.autoProcessing.requestDelayMs = num;
+                            await this.configManager.saveConfig(config);
+                        }
+                    });
+            });
     }
 
     private displayWatchFolders(container: HTMLElement, config: TransformationConfig): void {

@@ -18,6 +18,7 @@ export class TransformationConfigManager {
             folderPaths: [],
             frequencyMinutes: 60,
             minContentLengthRatio: 2.0,
+            requestDelayMs: 1000,
         };
     }
 
@@ -80,6 +81,7 @@ export class TransformationConfigManager {
                         : defaultAutoProcessing.folderPaths),
                 frequencyMinutes: loadedConfig.autoProcessing?.frequencyMinutes ?? defaultAutoProcessing.frequencyMinutes,
                 minContentLengthRatio: loadedConfig.autoProcessing?.minContentLengthRatio ?? defaultAutoProcessing.minContentLengthRatio,
+                requestDelayMs: loadedConfig.autoProcessing?.requestDelayMs ?? defaultAutoProcessing.requestDelayMs,
             },
         };
     }

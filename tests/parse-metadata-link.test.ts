@@ -233,6 +233,7 @@ describe("MetadataLinkParser", () => {
                     folderPaths: [],
                     frequencyMinutes: 60,
                     minContentLengthRatio: 2.0,
+                    requestDelayMs: 0,
                 },
             });
 

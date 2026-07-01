@@ -31,6 +31,7 @@ describe("TransformationConfigManager", () => {
             expect(config.autoProcessing.folderPaths).toEqual([]);
             expect(config.autoProcessing.frequencyMinutes).toBe(60);
             expect(config.autoProcessing.minContentLengthRatio).toBe(2.0);
+            expect(config.autoProcessing.requestDelayMs).toBe(1000);
         });
     });
 
@@ -66,6 +67,7 @@ describe("TransformationConfigManager", () => {
                         folderPaths: ["Articles"],
                         frequencyMinutes: 30,
                         minContentLengthRatio: 1.5,
+                        requestDelayMs: 500,
                     },
                 },
             });
@@ -98,6 +100,7 @@ describe("TransformationConfigManager", () => {
                         folderPath: "OldFolder",
                         frequencyMinutes: 60,
                         minContentLengthRatio: 2.0,
+                        requestDelayMs: 1000,
                     },
                 },
             });
@@ -122,7 +125,7 @@ describe("TransformationConfigManager", () => {
                         },
                     ],
                     enableProxyFallback: true,
-                    autoProcessing: { enabled: false, folderPaths: [], frequencyMinutes: 60, minContentLengthRatio: 2.0 },
+                    autoProcessing: { enabled: false, folderPaths: [], frequencyMinutes: 60, minContentLengthRatio: 2.0, requestDelayMs: 1000 },
                 },
             });
 
