@@ -1,227 +1,320 @@
-import { describe, it, expect, vi } from "vitest";
-import * as fs from "fs";
-import * as path from "path";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { App, TFile } from "../tests/__mocks__/obsidian";
 import { MetadataLinkParser } from "../src/parse-metadata-link";
 import { NoteService } from "../src/ReadItLaterStubs";
 
-const TEST_VAULT_DIR = path.resolve(__dirname, "..", "test-vault");
-
 /**
- * Recursively find all .md files under a directory.
+ * Build a set of realistic RSS-style markdown files in the mock vault.
+ * Mimics what the old test-vault/RSS/ directory used to contain.
  */
-function findMarkdownFiles(dir: string): string[] {
-    const results: string[] = [];
-    if (!fs.existsSync(dir)) {
-        return results;
+function seedRssFiles(vault: App["vault"]): string[] {
+    const files: Array<{ path: string; content: string }> = [
+        // Well-formed file with link and title
+        {
+            path: "RSS/tech-blog.md",
+            content: [
+                "---",
+                "title: Understanding Rust's Borrow Checker",
+                "link: https://example.com/rust-borrow-checker",
+                "author: Jane Doe",
+                "published: 2025-03-15",
+                "tags:",
+                "  - rust",
+                "  - programming",
+                "---",
+                "",
+                "Notes about the article go here.",
+            ].join("\n"),
+        },
+        // File using 'url' field instead of 'link'
+        {
+            path: "RSS/data-science.md",
+            content: [
+                "---",
+                "title: Machine Learning at Scale",
+                "url: https://example.com/ml-at-scale",
+                "author: John Smith",
+                "---",
+                "",
+                "Interesting read on distributed training.",
+            ].join("\n"),
+        },
+        // File using 'source' field
+        {
+            path: "RSS/devops-weekly.md",
+            content: [
+                "---",
+                "title: DevOps Weekly Roundup",
+                "source: https://example.com/devops-weekly-42",
+                "published: 2025-06-01",
+                "---",
+                "",
+                "Weekly newsletter summary.",
+            ].join("\n"),
+        },
+        // File with URL only in body content
+        {
+            path: "RSS/quick-link.md",
+            content: [
+                "---",
+                "title: Quick Link",
+                "tags:",
+                "  - bookmark",
+                "---",
+                "",
+                "Check out https://example.com/interesting-article for more.",
+            ].join("\n"),
+        },
+        // File with no URL at all
+        {
+            path: "RSS/empty-feed.md",
+            content: [
+                "---",
+                "title: Empty Feed Item",
+                "published: 2025-01-01",
+                "---",
+                "",
+                "This file has no URL to process.",
+            ].join("\n"),
+        },
+        // File with markdown link in body
+        {
+            path: "RSS/markdown-link.md",
+            content: [
+                "---",
+                "title: Referenced Article",
+                "---",
+                "",
+                "See [this article](https://example.com/referenced-article) for context.",
+            ].join("\n"),
+        },
+    ];
+
+    const paths: string[] = [];
+    for (const { path, content } of files) {
+        vault._setFileContent(path, content);
+        paths.push(path);
     }
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-        const full = path.join(dir, entry.name);
-        if (entry.isDirectory()) {
-            results.push(...findMarkdownFiles(full));
-        } else if (entry.name.endsWith(".md")) {
-            results.push(full);
-        }
-    }
-    return results;
+    return paths;
 }
 
 /**
- * Load test-vault files into the mock App vault.
- * Returns the list of vault-relative paths loaded.
+ * Seed files in a nested subfolder (RSS/CBN) for folder-level tests.
  */
-function loadTestVaultIntoApp(app: App, subDir?: string): string[] {
-    const baseDir = subDir ? path.join(TEST_VAULT_DIR, subDir) : TEST_VAULT_DIR;
-    const files = findMarkdownFiles(baseDir);
-    const relativePaths: string[] = [];
+function seedCbnFiles(vault: App["vault"]): string[] {
+    const files: Array<{ path: string; content: string }> = [
+        {
+            path: "RSS/CBN/article-1.md",
+            content: [
+                "---",
+                "title: CBN Article One",
+                "link: https://example.com/cbn/one",
+                "author: CBN Author",
+                "---",
+                "",
+                "First CBN article.",
+            ].join("\n"),
+        },
+        {
+            path: "RSS/CBN/article-2.md",
+            content: [
+                "---",
+                "title: CBN Article Two",
+                "link: https://example.com/cbn/two",
+                "---",
+                "",
+                "Second CBN article.",
+            ].join("\n"),
+        },
+        {
+            path: "RSS/CBN/article-3.md",
+            content: [
+                "---",
+                "title: CBN Article Three",
+                "link: https://example.com/cbn/three",
+                "article_processed: true",
+                "---",
+                "",
+                "Already processed.",
+            ].join("\n"),
+        },
+    ];
 
-    for (const absPath of files) {
-        const relPath = path.relative(TEST_VAULT_DIR, absPath).replace(/\\/g, "/");
-        const content = fs.readFileSync(absPath, "utf-8");
-        app.vault._setFileContent(relPath, content);
-        relativePaths.push(relPath);
+    const paths: string[] = [];
+    for (const { path, content } of files) {
+        vault._setFileContent(path, content);
+        paths.push(path);
     }
+    return paths;
+}
 
-    return relativePaths;
+/**
+ * Helper: build a NoteService backed by the mock App with network stubbed out.
+ */
+function createTestNoteService(app: App): NoteService {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const ns = new NoteService(app as any);
+    vi.spyOn(ns, "getMarkdownContent").mockResolvedValue(
+        "---\nauthor: Fetched Author\n---\n\n# Fetched Article\n\nFull article body content for testing.",
+    );
+    return ns;
 }
 
 describe("Integration: test-vault", () => {
-    it("test-vault directory exists and contains markdown files", () => {
-        expect(fs.existsSync(TEST_VAULT_DIR)).toBe(true);
-        const mdFiles = findMarkdownFiles(TEST_VAULT_DIR);
-        expect(mdFiles.length).toBeGreaterThan(0);
+    let app: App;
+    let noteService: NoteService;
+    let parser: MetadataLinkParser;
+
+    beforeEach(() => {
+        app = new App();
+        noteService = createTestNoteService(app);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        parser = new MetadataLinkParser(app as any, noteService);
     });
 
-    // ── Frontmatter URL extraction across real vault files ──────────
+    // ── Frontmatter URL extraction across RSS-style files ──────────
 
-    describe("frontmatter URL extraction on real vault files", () => {
-        it("every RSS file has a parseable 'link' in frontmatter", { timeout: 30000 }, () => {
-            const rssDir = path.join(TEST_VAULT_DIR, "RSS");
-            if (!fs.existsSync(rssDir)) {
-                return; // skip if RSS folder doesn't exist
-            }
+    describe("frontmatter URL extraction on RSS-style files", () => {
+        it("extracts URLs from all well-formed RSS files in a folder", async () => {
+            seedRssFiles(app.vault);
 
-            const mdFiles = findMarkdownFiles(rssDir);
-            expect(mdFiles.length).toBeGreaterThan(0);
+            const createNoteSpy = vi.spyOn(noteService, "createNote").mockResolvedValue();
 
-            const failures: string[] = [];
+            await parser.processFolderFiles("RSS");
 
-            for (const absPath of mdFiles) {
-                const content = fs.readFileSync(absPath, "utf-8");
-
-                // Check for frontmatter
-                if (!content.startsWith("---")) {
-                    failures.push(`${path.basename(absPath)}: no frontmatter`);
-                    continue;
-                }
-
-                const endIdx = content.indexOf("---", 3);
-                if (endIdx === -1) {
-                    failures.push(`${path.basename(absPath)}: unclosed frontmatter`);
-                    continue;
-                }
-
-                const fm = content.substring(3, endIdx).trim();
-
-                // Check that at least one URL field exists
-                const hasUrlField = /^(url|link|source|web_url|article_url)\s*:/m.test(fm);
-                if (!hasUrlField) {
-                    failures.push(`${path.basename(absPath)}: no URL field in frontmatter`);
-                }
-            }
-
-            // Allow a small percentage of failures (some files may legitimately lack URLs)
-            const failRate = failures.length / mdFiles.length;
-            expect(failRate).toBeLessThan(0.1); // <10% failure rate
+            // All files except empty-feed.md have URLs
+            // (5 out of 6 files have URLs: tech-blog, data-science, devops-weekly, quick-link, markdown-link)
+            expect(createNoteSpy).toHaveBeenCalledTimes(5);
         });
 
-        it("URL fields in RSS files contain valid URLs", () => {
-            const rssDir = path.join(TEST_VAULT_DIR, "RSS");
-            if (!fs.existsSync(rssDir)) {
-                return;
-            }
+        it("handles files with 'link' frontmatter field", async () => {
+            app.vault._setFileContent("RSS/test.md", [
+                "---",
+                "title: Test",
+                "link: https://example.com/test-link",
+                "---",
+                "",
+                "Body.",
+            ].join("\n"));
 
-            const mdFiles = findMarkdownFiles(rssDir);
-            let urlCount = 0;
-            let validCount = 0;
-
-            for (const absPath of mdFiles) {
-                const content = fs.readFileSync(absPath, "utf-8");
-                if (!content.startsWith("---")) {
-                    continue;
-                }
-
-                const endIdx = content.indexOf("---", 3);
-                if (endIdx === -1) {
-                    continue;
-                }
-
-                const fm = content.substring(3, endIdx);
-                const linkMatch = fm.match(/^link\s*:\s*(.+)$/m);
-                if (linkMatch) {
-                    urlCount++;
-                    const url = linkMatch[1].trim();
-                    if (url.startsWith("http://") || url.startsWith("https://")) {
-                        validCount++;
-                    }
-                }
-            }
-
-            expect(urlCount).toBeGreaterThan(0);
-            // All extracted link fields should be valid URLs
-            expect(validCount).toBe(urlCount);
-        });
-    });
-
-    // ── End-to-end: load vault → process file → verify output ──────
-
-    describe("end-to-end processing with mock network", () => {
-        it("processFile extracts URL from a real vault file and calls createNote", async () => {
-            const app = new App();
-            const paths = loadTestVaultIntoApp(app, "RSS");
-
-            // Pick a file that has a link
-            const testPath = paths.find((p) => p.startsWith("RSS/"));
-            if (!testPath) {
-                return; // no RSS files
-            }
-
-            const content = app.vault._getFileContent(testPath)!;
-            // Only test files with a link field
-            if (!content.includes("link:")) {
-                return;
-            }
-
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const ns = new NoteService(app as any);
-            const createNoteSpy = vi.spyOn(ns, "createNote").mockResolvedValue();
-
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const parser = new MetadataLinkParser(app as any, ns);
-            const file = new TFile(testPath);
-
+            const createNoteSpy = vi.spyOn(noteService, "createNote").mockResolvedValue();
+            const file = new TFile("RSS/test.md");
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await parser.processFile(file as any);
 
-            // createNote should have been called with the URL from frontmatter
-            expect(createNoteSpy).toHaveBeenCalledTimes(1);
-            const calledUrl = createNoteSpy.mock.calls[0][0];
-            expect(calledUrl).toMatch(/^https?:\/\//);
+            expect(createNoteSpy).toHaveBeenCalledWith("https://example.com/test-link");
         });
 
-        it("processFileAndAppend appends content to a real vault file", async () => {
-            const app = new App();
-            const paths = loadTestVaultIntoApp(app, "RSS");
+        it("handles files with 'url' frontmatter field", async () => {
+            app.vault._setFileContent("RSS/test.md", [
+                "---",
+                "title: Test",
+                "url: https://example.com/test-url",
+                "---",
+                "",
+                "Body.",
+            ].join("\n"));
 
-            // Pick a file with a link
-            const testPath = paths.find((p) => {
-                const c = app.vault._getFileContent(p);
-                return c && c.includes("link:") && !c.includes("article_processed: true");
-            });
-            if (!testPath) {
-                return;
-            }
-
+            const createNoteSpy = vi.spyOn(noteService, "createNote").mockResolvedValue();
+            const file = new TFile("RSS/test.md");
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const ns = new NoteService(app as any);
-            vi.spyOn(ns, "getMarkdownContent").mockResolvedValue(
-                "---\nauthor: Test Author\n---\n\n# Test Article\n\nTest body content here.",
-            );
+            await parser.processFile(file as any);
 
+            expect(createNoteSpy).toHaveBeenCalledWith("https://example.com/test-url");
+        });
+
+        it("handles files with 'source' frontmatter field", async () => {
+            app.vault._setFileContent("RSS/test.md", [
+                "---",
+                "title: Test",
+                "source: https://example.com/test-source",
+                "---",
+                "",
+                "Body.",
+            ].join("\n"));
+
+            const createNoteSpy = vi.spyOn(noteService, "createNote").mockResolvedValue();
+            const file = new TFile("RSS/test.md");
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const parser = new MetadataLinkParser(app as any, ns);
-            const file = new TFile(testPath);
+            await parser.processFile(file as any);
 
-            const originalContent = app.vault._getFileContent(testPath)!;
+            expect(createNoteSpy).toHaveBeenCalledWith("https://example.com/test-source");
+        });
+
+        it("falls back to body content when no frontmatter URL exists", async () => {
+            app.vault._setFileContent("RSS/test.md", [
+                "---",
+                "title: No URL in frontmatter",
+                "---",
+                "",
+                "Read more at https://example.com/body-url",
+            ].join("\n"));
+
+            const createNoteSpy = vi.spyOn(noteService, "createNote").mockResolvedValue();
+            const file = new TFile("RSS/test.md");
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            await parser.processFile(file as any);
+
+            expect(createNoteSpy).toHaveBeenCalledWith("https://example.com/body-url");
+        });
+
+        it("skips files that have no URL at all", async () => {
+            app.vault._setFileContent("RSS/test.md", [
+                "---",
+                "title: No URL",
+                "published: 2025-01-01",
+                "---",
+                "",
+                "Just some text.",
+            ].join("\n"));
+
+            const createNoteSpy = vi.spyOn(noteService, "createNote").mockResolvedValue();
+            const file = new TFile("RSS/test.md");
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            await parser.processFile(file as any);
+
+            expect(createNoteSpy).not.toHaveBeenCalled();
+        });
+    });
+
+    // ── End-to-end: batch folder processing ────────────────────────
+
+    describe("end-to-end processing with mock network", () => {
+        it("processFileAndAppend appends content and preserves frontmatter", async () => {
+            app.vault._setFileContent("RSS/test.md", [
+                "---",
+                "title: My Article",
+                "link: https://example.com/append-test",
+                "author: Original Author",
+                "---",
+                "",
+                "My personal notes about this article.",
+            ].join("\n"));
+
+            const file = new TFile("RSS/test.md");
+            const originalContent = app.vault._getFileContent(file.path)!;
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await parser.processFileAndAppend(file as any);
 
-            const updatedContent = app.vault._getFileContent(testPath)!;
+            const updatedContent = app.vault._getFileContent(file.path)!;
 
-            // Content should have been appended
+            // Content was appended
             expect(updatedContent.length).toBeGreaterThan(originalContent.length);
             expect(updatedContent).toContain("## Retrieved Article Content");
-            expect(updatedContent).toContain("Test body content here.");
+            expect(updatedContent).toContain("Full article body content for testing.");
+
+            // Original frontmatter preserved
+            expect(updatedContent).toContain("My Article");
+            expect(updatedContent).toContain("Original Author");
+            expect(updatedContent).toContain("My personal notes");
         });
 
-        it("processFolderFilesAndAppend processes multiple real vault files", async () => {
-            const app = new App();
-            loadTestVaultIntoApp(app, "RSS");
+        it("processFolderFilesAndAppend processes multiple files in a subfolder", async () => {
+            seedCbnFiles(app.vault);
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const ns = new NoteService(app as any);
-            vi.spyOn(ns, "getMarkdownContent").mockResolvedValue(
-                "# Bulk Article\n\nBulk body content.",
-            );
-
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const parser = new MetadataLinkParser(app as any, ns);
-
-            // Process the RSS/CBN folder
             await parser.processFolderFilesAndAppend("RSS/CBN");
 
-            // Check that at least some files were modified
             const allFiles = app.vault.getMarkdownFiles();
             const cbnFiles = allFiles.filter((f) => f.path.startsWith("RSS/CBN"));
             const processedFiles = cbnFiles.filter((f) => {
@@ -229,7 +322,41 @@ describe("Integration: test-vault", () => {
                 return content && content.includes("## Retrieved Article Content");
             });
 
-            expect(processedFiles.length).toBeGreaterThan(0);
+            // 3 files total: 2 unprocessed get content, 1 already-processed is skipped
+            expect(processedFiles.length).toBe(2);
+        });
+
+        it("skips already-processed files during batch folder processing", async () => {
+            seedCbnFiles(app.vault);
+
+            await parser.processFolderFilesAndAppend("RSS/CBN");
+
+            // article-3 was pre-marked as processed, should not have been appended
+            const processedFile = app.vault._getFileContent("RSS/CBN/article-3.md");
+            expect(processedFile).not.toContain("## Retrieved Article Content");
+        });
+
+        it("marks files as processed after successful batch append", async () => {
+            app.vault._setFileContent("RSS/fresh.md", [
+                "---",
+                "title: Fresh Article",
+                "link: https://example.com/fresh",
+                "---",
+                "",
+                "Body.",
+            ].join("\n"));
+
+            await parser.processFolderFilesAndAppend("RSS");
+
+            const content = app.vault._getFileContent("RSS/fresh.md");
+            expect(content).toContain("article_processed: true");
+        });
+
+        it("handles empty folders gracefully", async () => {
+            // No files in this path — should not throw
+            await expect(
+                parser.processFolderFilesAndAppend("RSS/NonExistent"),
+            ).resolves.toBeUndefined();
         });
     });
 
@@ -237,48 +364,69 @@ describe("Integration: test-vault", () => {
 
     describe("frontmatter integrity after processing", () => {
         it("preserves existing frontmatter fields when appending", async () => {
-            const app = new App();
-            loadTestVaultIntoApp(app, "RSS");
+            app.vault._setFileContent("RSS/rich.md", [
+                "---",
+                "title: Rich Frontmatter File",
+                "link: https://example.com/rich",
+                "author: Original Author",
+                "published: 2025-02-10",
+                "tags:",
+                "  - important",
+                "  - reference",
+                "---",
+                "",
+                "Notes before fetching.",
+            ].join("\n"));
 
-            const paths = app.vault.getMarkdownFiles()
-                .filter((f) => f.path.startsWith("RSS/"))
-                .map((f) => f.path);
-
-            const testPath = paths.find((p) => {
-                const c = app.vault._getFileContent(p);
-                return c && c.includes("link:") && c.includes("title:");
-            });
-            if (!testPath) {
-                return;
-            }
-
-            const originalContent = app.vault._getFileContent(testPath)!;
-            // Extract original title
-            const titleMatch = originalContent.match(/^title\s*:\s*(.+)$/m);
-            const originalTitle = titleMatch ? titleMatch[1].trim() : null;
-
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const ns = new NoteService(app as any);
-            vi.spyOn(ns, "getMarkdownContent").mockResolvedValue(
-                "---\nnew_field: new_value\n---\n\n# Article\n\nBody.",
-            );
-
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const parser = new MetadataLinkParser(app as any, ns);
-            const file = new TFile(testPath);
+            const file = new TFile("RSS/rich.md");
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await parser.processFileAndAppend(file as any);
 
-            const updated = app.vault._getFileContent(testPath)!;
+            const updated = app.vault._getFileContent(file.path)!;
 
-            // Original title should still be present
-            if (originalTitle) {
-                expect(updated).toContain(originalTitle);
-            }
+            // All original fields should still be present
+            expect(updated).toContain("title: Rich Frontmatter File");
+            expect(updated).toContain("link: https://example.com/rich");
+            expect(updated).toContain("author: Original Author");
+            expect(updated).toContain("published: 2025-02-10");
+            expect(updated).toContain("- important");
+            expect(updated).toContain("- reference");
+            expect(updated).toContain("Notes before fetching.");
 
-            // New field should be merged in
-            expect(updated).toContain("new_field");
+            // Fetched metadata (author: Fetched Author) should NOT overwrite existing
+            expect(updated).toContain("author: Original Author");
+            expect(updated).not.toMatch(/author: Fetched Author/);
+        });
+
+        it("merges fetched metadata keys that don't already exist", async () => {
+            app.vault._setFileContent("RSS/sparse.md", [
+                "---",
+                "title: Sparse Frontmatter",
+                "link: https://example.com/sparse",
+                "---",
+                "",
+                "Minimal metadata.",
+            ].join("\n"));
+
+            vi.spyOn(noteService, "getMarkdownContent").mockResolvedValue(
+                "---\nauthor: New Author\npublished: 2025-06-15\ndescription: A great read\n---\n\n# Article\n\nBody.",
+            );
+
+            const file = new TFile("RSS/sparse.md");
+
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            await parser.processFileAndAppend(file as any);
+
+            const updated = app.vault._getFileContent(file.path)!;
+
+            // Original fields preserved
+            expect(updated).toContain("title: Sparse Frontmatter");
+
+            // New fields from fetched metadata merged in
+            expect(updated).toContain("author: New Author");
+            expect(updated).toContain("published: 2025-06-15");
+            expect(updated).toContain("description: A great read");
         });
     });
 });
