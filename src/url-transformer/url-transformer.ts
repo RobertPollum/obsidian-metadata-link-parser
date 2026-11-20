@@ -106,21 +106,26 @@ export class UrlTransformer {
     }
 
     private async checkProxyHealthWithTimeout(url: string): Promise<boolean> {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), this.timeoutMs);
+        let timeoutId: ReturnType<typeof setTimeout> | undefined;
+        const timeoutPromise = new Promise<never>((_, reject) => {
+            timeoutId = setTimeout(() => reject(new Error("Health check timed out")), this.timeoutMs);
+        });
 
         try {
-            const response = await requestUrl({
-                url: url,
-                method: "HEAD",
-            });
+            const response = await Promise.race([
+                requestUrl({
+                    url: url,
+                    method: "HEAD",
+                }),
+                timeoutPromise,
+            ]);
 
-            clearTimeout(timeoutId);
             return response.status >= 200 && response.status < 400;
         } catch (error) {
-            clearTimeout(timeoutId);
             console.warn(`Proxy health check failed for ${url}:`, error);
             return false;
+        } finally {
+            clearTimeout(timeoutId);
         }
     }
 
